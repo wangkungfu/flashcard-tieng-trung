@@ -5,168 +5,212 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Flashcard Tiếng Trung - Anh Wang</title>
     <style>
-        :root { --primary: #5c88da; --danger: #ff6b6b; --success: #20bf6b; --warning: #feca57; }
+        :root { --primary: #3498db; --danger: #ff6b6b; --success: #5cdb5c; --warning: #feca57; --bg-pink: #ffd6e8; --text-dark: #2c3e50; }
+        
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh; -webkit-tap-highlight-color: transparent;
-            background: linear-gradient(-45deg, #ff9a9e, #fecfef, #a1c4fd, #c2e9fb); background-size: 400% 400%; animation: gradientBG 15s ease infinite; color: #2c3e50;
+            margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;
+            background-color: var(--bg-pink); color: var(--text-dark); -webkit-tap-highlight-color: transparent;
         }
-        @keyframes gradientBG { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+
         #app-container { flex: 1; overflow-y: auto; padding: 15px; padding-top: 30px; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; }
 
-        /* GIAO DIỆN HỌC TẬP */
+        /* ================= GIAO DIỆN HỌC BÀI TỐI GIẢN & TINH TẾ ================= */
         #study-view { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
-        .deck-selector-box {
-            width: 100%; padding: 15px; border-radius: 20px; margin-bottom: 20px; box-sizing: border-box;
-            background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.6); box-shadow: 0 8px 32px rgba(31, 38, 135, 0.1); border-left: 6px solid var(--primary);
+        
+        .deck-selector-box { width: 100%; margin-bottom: 20px; background: white; padding: 15px; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .deck-selector-box select { 
+            width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #dfe6e9; font-size: 16px; font-weight: bold; 
+            color: var(--primary); background: #f8f9fa; outline: none; text-align: center;
         }
-        .deck-selector-box label { font-size: 12px; font-weight: 800; color: #34495e; text-transform: uppercase; letter-spacing: 1px; display: block; margin-bottom: 8px; }
-        .deck-selector-box select { width: 100%; padding: 10px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.8); font-size: 16px; font-weight: bold; color: var(--primary); background: rgba(255,255,255,0.9); outline: none; }
 
-        .scene { width: 100%; height: 460px; perspective: 1000px; animation: floatCard 4s ease-in-out infinite; }
-        @keyframes floatCard { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
-
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; border-radius: 25px; box-shadow: 0 20px 40px rgba(0,0,0,0.15); }
+        .scene { width: 100%; height: 420px; perspective: 1000px; }
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
         .card.is-flipped { transform: rotateY(180deg); }
+        
         .card-face {
             position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 25px; background: rgba(255, 255, 255, 0.9); display: flex; flex-direction: column; padding: 20px; box-sizing: border-box;
-            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.8);
+            border-radius: 20px; background: white; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; box-sizing: border-box;
         }
-        .card-face-front { justify-content: center; align-items: center; text-align: center; }
-        .card-face-back { background: #ffffff; transform: rotateY(180deg); align-items: center; text-align: center; overflow-y: auto; }
+        
+        /* MẶT TRƯỚC (ẢNH) */
+        .card-face-front { justify-content: flex-start; }
+        .front-image { width: 100%; height: 80%; object-fit: cover; border-radius: 12px; background-color:#eee; }
+        .front-hint { margin-top: 20px; font-size: 15px; color: #95a5a6; font-weight: 500; }
+        .edit-img-btn { position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.6); color: white; border: none; padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 10; }
 
-        .edit-img-btn { position: absolute; top: 15px; right: 15px; background: rgba(0, 0, 0, 0.5); color: white; border: 1px solid rgba(255,255,255,0.3); padding: 8px 15px; border-radius: 20px; font-size: 13px; font-weight: bold; cursor: pointer; z-index: 10; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
-        .front-image { width: 100%; height: 85%; object-fit: cover; border-radius: 15px; box-shadow: 0 8px 16px rgba(0,0,0,0.1); background-color:#eee; }
-        .hanzi { font-size: 60px; font-weight: 900; margin: 15px 0 0 0; color: #2c3e50; text-shadow: 2px 2px 4px rgba(0,0,0,0.1); }
-        .pinyin { font-size: 28px; font-weight: 700; margin-top: 5px; }
-        .meaning { font-size: 24px; font-weight: 900; color: var(--primary); margin-top: 20px; margin-bottom: 5px; }
-        .han-viet { font-size: 16px; color: #7f8c8d; font-style: italic; background: #f1f2f6; padding: 4px 12px; border-radius: 20px; }
+        /* MẶT SAU (TỐI GIẢN Y HỆT ẢNH MẪU) */
+        .card-face-back { transform: rotateY(180deg); }
+        .hanzi { font-size: 80px; font-weight: 900; color: #34495e; margin: 0; line-height: 1; }
+        .pinyin { font-size: 28px; font-weight: bold; color: #000; margin-top: 15px; margin-bottom: 25px; }
+        .audio-btn { 
+            padding: 10px 25px; font-size: 16px; background: #f8f9fa; color: #2c3e50; 
+            border: 1px solid #dfe6e9; border-radius: 50px; cursor: pointer; font-weight: 500; margin-bottom: 30px;
+        }
+        .meaning { font-size: 24px; font-weight: 900; color: var(--primary); margin: 0; }
 
-        .audio-btn { margin-top: 20px; padding: 12px 25px; font-size: 16px; background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); color: #2c3e50; font-weight: bold; border: none; border-radius: 50px; cursor: pointer; box-shadow: 0 4px 15px rgba(142, 197, 252, 0.5); transition: 0.2s;}
-        .audio-btn:active { transform: scale(0.95); }
+        #stats { margin-top: 25px; font-size: 15px; color: #7f8c8d; font-weight: 500; }
 
         .action-buttons { display: flex; gap: 10px; margin-top: 25px; width: 100%; opacity: 0; pointer-events: none; transform: translateY(20px); transition: all 0.4s ease; }
         .action-buttons.visible { opacity: 1; pointer-events: auto; transform: translateY(0); }
-        .action-buttons button { padding: 12px 5px; font-size: 14px; font-weight: 800; border: none; border-radius: 15px; color: white; flex: 1; box-shadow: 0 6px 15px rgba(0,0,0,0.15); cursor: pointer; }
-        .action-buttons button:active { transform: scale(0.92); }
-        .btn-hard { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); color: #d63031; border: 2px solid #ff9a9e;}
-        .btn-good { background: linear-gradient(135deg, #f6d365 0%, #fda085 100%); color: #d35400; border: 2px solid #f6d365;}
-        .btn-easy { background: linear-gradient(135deg, #84fab0 0%, #8fd3f4 100%); color: #009432; border: 2px solid #84fab0;}
-        #stats { margin-top: 20px; font-size: 14px; color: #2c3e50; font-weight: bold; background: rgba(255,255,255,0.5); padding: 5px 15px; border-radius: 20px; backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);}
+        .action-buttons button { padding: 15px 5px; font-size: 14px; font-weight: bold; border: none; border-radius: 15px; color: white; flex: 1; box-shadow: 0 4px 10px rgba(0,0,0,0.1); cursor: pointer; }
+        .btn-hard { background: var(--danger); }
+        .btn-good { background: var(--warning); color: #2c3e50; }
+        .btn-easy { background: var(--success); }
 
-        /* MÀN HÌNH TỔNG KẾT */
-        #end-screen { display: none; width: 100%; max-width: 400px; border-radius: 25px; padding: 25px; box-sizing: border-box; text-align: center; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); box-shadow: 0 15px 35px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.6); }
+        #end-screen { display: none; width: 100%; max-width: 400px; background: white; border-radius: 20px; padding: 30px; box-sizing: border-box; text-align: center; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
-        /* GIAO DIỆN THÊM TỪ */
+        /* ================= GIAO DIỆN NHẬP LIỆU (QUY TRÌNH 2 BƯỚC) ================= */
         #add-view { width: 100%; max-width: 400px; display: none; flex-direction: column; }
-        .bulk-add-box { padding: 20px; border-radius: 25px; margin-bottom: 20px; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 10px 30px rgba(0,0,0,0.05); border: 1px solid rgba(255,255,255,0.6); }
-        .bulk-add-box h3 { margin-top: 0; color: var(--primary); font-size: 18px; font-weight: 900; margin-bottom: 15px;}
-        .control-group { margin-bottom: 15px; display: flex; gap: 10px; }
-        .control-group select { flex: 1; padding: 12px; border-radius: 12px; border: 2px solid white; font-size: 15px; font-weight: bold; color: var(--primary); outline: none; background: rgba(255,255,255,0.8); }
-        .control-group button { padding: 0 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; white-space: nowrap; }
-        .bulk-add-box textarea { width: 100%; padding: 15px; border: 2px solid white; border-radius: 15px; box-sizing: border-box; font-size: 14px; font-family: monospace; resize: vertical; background: rgba(255,255,255,0.7); }
-        .btn-save { width: 100%; padding: 15px; background: linear-gradient(135deg, #00b09b 0%, #96c93d 100%); color: white; font-size: 15px; font-weight: 900; border: none; border-radius: 15px; cursor: pointer; margin-top: 15px; }
-        .btn-delete-deck { width: 100%; padding: 12px; background: rgba(255,255,255,0.5); color: #d63031; font-size: 14px; font-weight: bold; border: 2px solid #ff7675; border-radius: 15px; cursor: pointer; margin-top: 10px; }
+        
+        /* BƯỚC 1: DÁN TEXT (Giống y hệt ý anh) */
+        #step-1-text { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
+        #step-1-text h3 { margin: 0 0 15px 0; color: var(--primary); font-size: 20px; font-weight: 900; text-align: center;}
+        .control-group { display: flex; gap: 10px; margin-bottom: 15px;}
+        .control-group select { flex: 1; padding: 12px; border-radius: 12px; border: 1px solid #dfe6e9; font-size: 15px; font-weight: bold; color: var(--primary); outline: none; background: #f8f9fa;}
+        .control-group button { padding: 0 15px; background: var(--primary); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        
+        .syntax-hint { background: white; padding: 10px; border-radius: 10px; margin-bottom: 15px; border: 1px solid #dfe6e9;}
+        .syntax-hint p { margin: 0; font-size: 13px; color: #d35400; font-weight: bold; }
+        
+        #bulk-input { width: 100%; padding: 15px; border: 1px solid #dfe6e9; border-radius: 15px; box-sizing: border-box; font-size: 14px; font-family: monospace; resize: vertical; background: #f8f9fa; margin-bottom: 15px;}
+        
+        .btn-next { width: 100%; padding: 15px; background: var(--success); color: white; font-size: 16px; font-weight: 900; border: none; border-radius: 15px; cursor: pointer; box-shadow: 0 4px 10px rgba(92, 219, 92, 0.3); }
 
-        /* TAB BAR BOTTOM */
-        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; display: flex; z-index: 100; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border-top: 1px solid rgba(255,255,255,0.5); padding-bottom: env(safe-area-inset-bottom); }
-        .tab-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; font-weight: 800; color: #a4b0be; cursor: pointer; transition: 0.3s; text-transform: uppercase;}
+        /* BƯỚC 2: XEM TRƯỚC VÀ CHÈN ẢNH (Bảng chứa các từ) */
+        #step-2-images { display: none; width: 100%; flex-direction: column;}
+        .step-2-header { background: white; padding: 15px 20px; border-radius: 20px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;}
+        .step-2-header h3 { margin: 0; color: var(--text-dark); font-size: 16px;}
+        .btn-back { background: transparent; border: none; color: #7f8c8d; font-weight: bold; font-size: 14px; cursor: pointer; text-decoration: underline;}
+
+        #preview-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; padding-bottom: 10px; max-height: 450px;}
+        
+        /* TỪNG HÀNG XEM TRƯỚC */
+        .preview-item { display: flex; background: white; border-radius: 15px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); align-items: center; justify-content: space-between; gap: 15px;}
+        .preview-info { flex: 1; display: flex; flex-direction: column; }
+        .preview-info strong { font-size: 20px; color: var(--text-dark); font-weight: 900;}
+        .preview-info span { font-size: 14px; color: #7f8c8d; margin: 3px 0;}
+        .preview-info em { font-size: 15px; color: var(--primary); font-weight: bold; font-style: normal;}
+        
+        /* Ô UP ẢNH TỪNG TỪ */
+        .preview-img-box { width: 75px; height: 75px; border-radius: 10px; background: #f1f2f6; position: relative; cursor: pointer; overflow: hidden; display: flex; justify-content: center; align-items: center; border: 2px dashed #bdc3c7; flex-shrink: 0;}
+        .preview-img-box img { width: 100%; height: 100%; object-fit: cover; position: absolute; top:0; left:0; z-index: 1; display: none;}
+        .preview-img-box span { z-index: 2; font-size: 24px; color: #95a5a6; }
+        .preview-img-box p { position: absolute; bottom: 3px; margin:0; font-size: 10px; color: #7f8c8d; font-weight: bold; z-index: 2;}
+
+        .btn-save-final { width: 100%; padding: 18px; background: var(--primary); color: white; font-size: 16px; font-weight: 900; border: none; border-radius: 20px; cursor: pointer; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4); }
+
+        /* TAB BAR */
+        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; display: flex; background: white; box-shadow: 0 -2px 10px rgba(0,0,0,0.05); padding-bottom: env(safe-area-inset-bottom); z-index: 100; border-top-left-radius: 20px; border-top-right-radius: 20px;}
+        .tab-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 12px; font-weight: bold; color: #bdc3c7; cursor: pointer; transition: 0.2s;}
         .tab-item.active { color: var(--primary); }
-        .tab-icon { font-size: 24px; margin-bottom: 3px; transition: transform 0.2s;}
-        .tab-item.active .tab-icon { transform: translateY(-3px) scale(1.1); }
+        .tab-icon { font-size: 24px; margin-bottom: 4px; }
     </style>
 </head>
 <body>
     <div id="app-container">
         <div id="study-view">
             <div class="deck-selector-box" id="deck-selector-box">
-                <label>Chủ đề đang học</label>
                 <select id="study-deck-select" onchange="changeStudyDeck()"></select>
             </div>
-            <div id="empty-state" style="display: none; text-align: center; margin-top: 30px; padding: 20px; background: rgba(255,255,255,0.8); border-radius: 20px;">
+            
+            <div id="empty-state" style="display: none; text-align: center; margin-top: 30px; padding: 30px; background: white; border-radius: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
                 <h3 style="color: #2c3e50; margin-top: 0;">Trang này trống!</h3>
-                <p style="color: #34495e; font-size: 14px;">Sang mục Nhập Liệu để dán từ vựng vào nhé.</p>
+                <p style="color: #7f8c8d; font-size: 15px;">Anh qua tab Nhập Liệu để chèn từ nhé.</p>
             </div>
+
             <div class="scene" id="learning-area">
                 <div class="card" id="flashcard" onclick="flipCard()">
                     <div class="card-face card-face-front">
-                        <button class="edit-img-btn" onclick="triggerImageUpload(event)">📷 Thay ảnh</button>
+                        <button class="edit-img-btn" onclick="triggerImageUpload(event)">📷 Đổi ảnh</button>
                         <img id="front-image" class="front-image" src="" alt="Hình minh họa">
-                        <p style="color:#7f8c8d; font-size:13px; position:absolute; bottom:12px; margin:0; font-weight:bold; background:rgba(255,255,255,0.9); padding:5px 15px; border-radius:20px;">👆 Chạm để lật xem chữ</p>
+                        <div class="front-hint">👇 Chạm để xem đáp án</div>
                     </div>
                     <div class="card-face card-face-back">
-                        <div class="hanzi" id="back-hanzi">字</div>
-                        <div class="pinyin" id="back-pinyin">zì</div>
-                        <button class="audio-btn" onclick="playAudio(event)">🔊 Phát âm</button>
-                        <div class="meaning" id="back-meaning">Nghĩa của từ</div>
-                        <div class="han-viet" id="back-hanviet">Âm Hán Việt</div>
+                        <h1 class="hanzi" id="back-hanzi">家</h1>
+                        <div class="pinyin" id="back-pinyin">jiā</div>
+                        <button class="audio-btn" onclick="playAudio(event)">🔊 Nghe Đọc</button>
+                        <div class="meaning" id="back-meaning">Gia</div>
                     </div>
                 </div>
             </div>
-            <div class="action-buttons" id="action-buttons">
-                <button class="btn-hard" onclick="processReview(1)">😓 Khó<br><span style="font-size:10px;font-weight:normal">Lặp lại</span></button>
-                <button class="btn-good" onclick="processReview(3)">🤔 Thường<br><span style="font-size:10px;font-weight:normal">Tổng kết</span></button>
-                <button class="btn-easy" onclick="processReview(5)">🤩 Dễ<br><span style="font-size:10px;font-weight:normal">Nhớ lâu</span></button>
-            </div>
+            
             <div id="stats">Thẻ: 0 / 0</div>
+
+            <div class="action-buttons" id="action-buttons">
+                <button class="btn-hard" onclick="processReview(1)">Khó</button>
+                <button class="btn-good" onclick="processReview(3)">Bình thường</button>
+                <button class="btn-easy" onclick="processReview(5)">Dễ</button>
+            </div>
+            
             <input type="file" id="imageUploader" accept="image/*" style="display: none;">
             <div id="end-screen"></div>
         </div>
 
         <div id="add-view">
-            <div class="bulk-add-box">
+            
+            <div id="step-1-text">
                 <h3>Thêm Từ Mới Nhanh</h3>
-                <label style="font-size: 13px; font-weight: bold; color: #34495e; margin-bottom: 8px; display: block;">Vị trí lưu thẻ:</label>
+                <label style="font-size: 13px; font-weight: bold; color: #34495e; margin-bottom: 5px; display: block;">Vị trí lưu thẻ:</label>
                 <div class="control-group">
                     <select id="add-deck-select"></select>
                     <button onclick="promptCreateDeck()">+ TẠO MỚI</button>
                 </div>
-                <div style="background: rgba(255,255,255,0.8); padding: 10px; border-radius: 12px; margin-bottom: 15px;">
-                    <p style="margin: 0; font-size: 13px; color: #d35400; font-weight: bold;">Cú pháp nhập: Chữ Hán | Pinyin | Nghĩa</p>
+                
+                <div class="syntax-hint">
+                    <p>Cú pháp nhập: Chữ Hán | Pinyin | Nghĩa</p>
                 </div>
-                <textarea id="bulk-input" rows="6" placeholder="苹果 | píng guǒ | Quả táo&#10;西瓜 | xī guā | Dưa hấu"></textarea>
-                <button class="btn-save" onclick="saveBulkWords()">✨ TẠO THẺ TỪ VỰNG</button>
-                <button class="btn-delete-deck" onclick="deleteCurrentDeck()">🗑️ Xóa sạch thư mục này</button>
+                
+                <textarea id="bulk-input" rows="7" placeholder="苹果 | píng guǒ | Quả táo&#10;西瓜 | xī guā | Dưa hấu"></textarea>
+                
+                <button class="btn-next" onclick="goToStep2()">➡️ Tiếp tục: Chọn Ảnh</button>
+                <div style="text-align:center; margin-top:15px;">
+                    <button onclick="deleteCurrentDeck()" style="background:transparent; border:none; color:var(--danger); font-weight:bold; text-decoration:underline;">Xóa sạch thư mục này</button>
+                </div>
             </div>
+
+            <div id="step-2-images">
+                <div class="step-2-header">
+                    <h3>Gắn ảnh minh họa</h3>
+                    <button class="btn-back" onclick="goBackToStep1()">⬅️ Sửa lại chữ</button>
+                </div>
+
+                <div id="preview-list"></div>
+
+                <button class="btn-save-final" onclick="saveFinalToDeck()">✨ LƯU TẤT CẢ VÀO THƯ MỤC</button>
+            </div>
+
         </div>
     </div>
 
     <div class="tab-bar">
         <div class="tab-item active" id="tab-study" onclick="switchTab('study')">
-            <span class="tab-icon">🎯</span><span>Học Bài</span>
+            <span class="tab-icon">📚</span><span>Học Bài</span>
         </div>
         <div class="tab-item" id="tab-add" onclick="switchTab('add')">
-            <span class="tab-icon">⚡</span><span>Nhập Liệu</span>
+            <span class="tab-icon">✏️</span><span>Nhập Liệu</span>
         </div>
     </div>
 
     <script>
-        const defaultList = [
-            { hanzi: "山羊", pinyin: "shān yáng", han_viet: "Sơn Dương", meaning: "Con dê", image_url: "https://i.ytimg.com/vi/OGrebpePK1Y/hq720.jpg" },
-            { hanzi: "手表", pinyin: "shǒu biǎo", han_viet: "Thủ Biểu", meaning: "Đồng hồ đeo tay", image_url: "https://teachmechinese.wordpress.com/wp-content/uploads/2014/01/wrist-watch-s.jpg" },
-            { hanzi: "熊猫", pinyin: "xióng māo", han_viet: "Hùng Miêu", meaning: "Gấu trúc", image_url: "https://upload.wikimedia.org/wikipedia/commons/0/0f/Grosser_Panda.JPG" },
-            { hanzi: "风筝", pinyin: "fēng zheng", han_viet: "Phong Tranh", meaning: "Cái diều", image_url: "https://static.independent.co.uk/2023/05/09/13/Kites%201.jpg" },
-            { hanzi: "快", pinyin: "kuài", han_viet: "Khoái", meaning: "Nhanh", image_url: "https://www.hantrainerpro.com/hanzi/kuai_fast-chinese-character.jpg" },
-            { hanzi: "圆", pinyin: "yuán", han_viet: "Viên", meaning: "Hình tròn", image_url: "https://www.flaticon.com/free-icon/yuan_round-chinese-character.jpg" },
-            { hanzi: "窗户", pinyin: "chuāng hu", han_viet: "Song Hộ", meaning: "Cửa sổ", image_url: "https://dictionary.hantrainerpro.com/hanzi/chuanghu_window-chinese-character.jpg" },
-            { hanzi: "鸟", pinyin: "niǎo", han_viet: "Điểu", meaning: "Con chim", image_url: "https://chinasage.info/chars/so_ch_niao_bird.gif" },
-            { hanzi: "他喜欢狗", pinyin: "Tā xǐ huān gǒu", han_viet: "Tha hỉ hoan cẩu", meaning: "Cô ấy/Anh ấy thích chó", image_url: "https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=400" },
-            { hanzi: "她在洗手", pinyin: "Tā zài xǐ shǒu", han_viet: "Tha tại tẩy thủ", meaning: "Cô ấy đang rửa tay", image_url: "https://images.unsplash.com/photo-1584515933487-779824d29309?w=400" },
-            { hanzi: "熊猫是蓝色的", pinyin: "Xióng māo shì lán sè de", han_viet: "Hùng miêu thị lam sắc đích", meaning: "Gấu trúc màu xanh", image_url: "https://www.powercoin.it/20304-large_default_2x/panda-space-blue-silver-coin-10-yuan-china-2021.jpg" },
-            { hanzi: "我在吃饭", pinyin: "Wǒ zài chī fàn", han_viet: "Ngã tại ngật phạn", meaning: "Tôi đang ăn cơm", image_url: "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=400" },
-            { hanzi: "她在骑马", pinyin: "Tā zài qí mǎ", han_viet: "Tha tại kỵ mã", meaning: "Cô ấy đang cưỡi ngựa", image_url: "https://images.unsplash.com/photo-1553011409-a78cde72eebc?w=400" }
-        ];
+        function safeGetStorage(key) { try { return localStorage.getItem(key); } catch (e) { return null; } }
+        function safeSetStorage(key, value) { try { localStorage.setItem(key, value); } catch (e) { console.warn("Trình duyệt chặn lưu trữ."); } }
 
         let appData = {}; let currentStudyDeck = ""; let sessionDeck = []; let currentIndex = 0; let isFlipped = false; 
         let hardReviewQueue = []; let normalSummaryList = []; let allEasy = true;
 
+        const defaultBg = "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=400&q=80";
+        
+        // Mảng tạm thời để lưu dữ liệu lúc gán ảnh (Bước 2)
+        let tempPreviewWords = [];
+
         function initApp() {
-            let storedData = null;
-            try { storedData = localStorage.getItem('anhwang_final'); } catch (e) {}
+            let storedData = safeGetStorage('anhwang_v13');
             if (storedData) { appData = JSON.parse(storedData); } 
-            else { appData = { "Từ vựng mặc định": [...defaultList] }; try { localStorage.setItem('anhwang_final', JSON.stringify(appData)); } catch(e){} }
+            else { 
+                appData = { "Từ vựng mặc định": [{ hanzi: "山羊", pinyin: "shān yáng", meaning: "Con dê", image_url: "https://i.ytimg.com/vi/OGrebpePK1Y/hq720.jpg" }] }; 
+                safeSetStorage('anhwang_v13', JSON.stringify(appData)); 
+            }
             updateDeckSelectors();
         }
 
@@ -180,7 +224,7 @@
                 studySel.innerHTML += `<option value="${deckName}">${deckName} (${count} từ)</option>`;
                 addSel.innerHTML += `<option value="${deckName}">${deckName}</option>`;
             }
-            if (!firstDeck) { appData["Từ vựng mặc định"] = []; try{localStorage.setItem('anhwang_final', JSON.stringify(appData));}catch(e){} updateDeckSelectors(); return; }
+            if (!firstDeck) { appData["Từ vựng mặc định"] = []; safeSetStorage('anhwang_v13', JSON.stringify(appData)); updateDeckSelectors(); return; }
             if (defaultSelected && appData[defaultSelected]) { studySel.value = defaultSelected; addSel.value = defaultSelected; }
             changeStudyDeck();
         }
@@ -191,44 +235,141 @@
             const cleanName = name.trim();
             if (appData[cleanName]) { alert("Tên này đã tồn tại!"); return; }
             appData[cleanName] = [];
-            try{localStorage.setItem('anhwang_final', JSON.stringify(appData));}catch(e){} updateDeckSelectors(cleanName);
+            safeSetStorage('anhwang_v13', JSON.stringify(appData)); updateDeckSelectors(cleanName);
         }
 
         function deleteCurrentDeck() {
             const targetDeck = document.getElementById('add-deck-select').value;
             if (!targetDeck) return;
-            if (confirm(`⚠️ Xóa thư mục "${targetDeck}"?`)) {
+            if (confirm(`⚠️ Xóa sạch thư mục "${targetDeck}"?`)) {
                 delete appData[targetDeck];
-                try{localStorage.setItem('anhwang_final', JSON.stringify(appData));}catch(e){} updateDeckSelectors();
+                safeSetStorage('anhwang_v13', JSON.stringify(appData)); updateDeckSelectors();
+            }
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-study').classList.remove('active'); document.getElementById('tab-add').classList.remove('active');
+            document.getElementById('study-view').style.display = 'none'; document.getElementById('add-view').style.display = 'none';
+            if (tab === 'study') { 
+                document.getElementById('tab-study').classList.add('active'); document.getElementById('study-view').style.display = 'flex'; 
+                updateDeckSelectors(document.getElementById('add-deck-select').value); 
+            } else { 
+                document.getElementById('tab-add').classList.add('active'); document.getElementById('add-view').style.display = 'flex'; 
+                // Reset về bước 1 khi đổi tab
+                goBackToStep1();
+                updateDeckSelectors(currentStudyDeck); 
             }
         }
 
         function changeStudyDeck() { currentStudyDeck = document.getElementById('study-deck-select').value; startStudySession(); }
 
-        function switchTab(tab) {
-            document.getElementById('tab-study').classList.remove('active'); document.getElementById('tab-add').classList.remove('active');
-            document.getElementById('study-view').style.display = 'none'; document.getElementById('add-view').style.display = 'none';
-            if (tab === 'study') { document.getElementById('tab-study').classList.add('active'); document.getElementById('study-view').style.display = 'flex'; updateDeckSelectors(document.getElementById('add-deck-select').value); } 
-            else { document.getElementById('tab-add').classList.add('active'); document.getElementById('add-view').style.display = 'flex'; updateDeckSelectors(currentStudyDeck); }
-        }
+        // ================= LOGIC NHẬP LIỆU (2 BƯỚC) ================= //
 
-        function saveBulkWords() {
-            const text = document.getElementById('bulk-input').value.trim(); const targetDeck = document.getElementById('add-deck-select').value;
-            if (!text || !targetDeck) return;
-            const lines = text.split('\n'); let addedCount = 0;
-            const defaultBg = "https://images.unsplash.com/photo-1515260268569-9271009adfdb?auto=format&fit=crop&w=400&q=80"; 
+        // BƯỚC 1 -> BƯỚC 2: Tách chữ và vẽ danh sách
+        function goToStep2() {
+            const text = document.getElementById('bulk-input').value.trim();
+            if(!text) return alert("Anh chưa nhập chữ nào vào ô cả!");
+            
+            tempPreviewWords = [];
+            const lines = text.split('\n');
+            
             lines.forEach(line => {
                 const parts = line.split('|').map(s => s.trim());
                 if (parts.length >= 2) {
                     let hanzi = parts[0], pinyin = parts[1] || "", meaning = parts[2] || "";
                     if (parts.length === 2) { hanzi = parts[0]; pinyin = parts[0]; meaning = parts[1]; }
-                    appData[targetDeck].push({ hanzi: hanzi, pinyin: pinyin, han_viet: "", meaning: meaning, image_url: defaultBg });
-                    addedCount++;
+                    tempPreviewWords.push({ hanzi: hanzi, pinyin: pinyin, meaning: meaning, image_url: defaultBg });
                 }
             });
-            if (addedCount > 0) { try{localStorage.setItem('anhwang_final', JSON.stringify(appData));}catch(e){} alert(`Đã lưu ${addedCount} từ!`); document.getElementById('bulk-input').value = ""; updateDeckSelectors(targetDeck); }
+
+            if (tempPreviewWords.length === 0) return alert("Sai cú pháp rồi anh ơi, nhớ dùng dấu | để phân cách nhé.");
+
+            // Vẽ danh sách Preview
+            const previewList = document.getElementById('preview-list');
+            previewList.innerHTML = '';
+            
+            tempPreviewWords.forEach((word, index) => {
+                const item = document.createElement('div');
+                item.className = 'preview-item';
+                item.innerHTML = `
+                    <div class="preview-info">
+                        <strong>${word.hanzi}</strong>
+                        <span>${word.pinyin}</span>
+                        <em>${word.meaning}</em>
+                    </div>
+                    <div class="preview-img-box" onclick="this.querySelector('input').click()">
+                        <img class="preview-img" alt="Hình" style="display:none;">
+                        <span class="icon-cam">📷</span>
+                        <p class="icon-txt">Thêm ảnh</p>
+                        <input type="file" accept="image/*" style="display:none" onchange="handlePreviewImage(this, ${index})">
+                    </div>
+                `;
+                previewList.appendChild(item);
+            });
+
+            // Chuyển giao diện
+            document.getElementById('step-1-text').style.display = 'none';
+            document.getElementById('step-2-images').style.display = 'flex';
         }
 
+        // Xử lý ảnh tại Bước 2
+        function handlePreviewImage(input, index) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    // Nén ảnh để tránh tràn bộ nhớ iPhone
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 300; let scale = 1;
+                    if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
+                    canvas.width = img.width * scale; canvas.height = img.height * scale;
+                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                    
+                    // Lưu vào mảng tạm
+                    tempPreviewWords[index].image_url = dataUrl;
+
+                    // Hiện ảnh lên ô
+                    const box = input.parentElement;
+                    const preview = box.querySelector('.preview-img');
+                    preview.src = dataUrl;
+                    preview.style.display = 'block';
+                    box.querySelector('.icon-cam').style.display = 'none';
+                    box.querySelector('.icon-txt').style.display = 'none';
+                    box.style.border = 'none';
+                }
+                img.src = event.target.result;
+            }
+            reader.readAsDataURL(file);
+            input.value = ""; 
+        }
+
+        // Lưu toàn bộ vào dữ liệu chính
+        function saveFinalToDeck() {
+            const targetDeck = document.getElementById('add-deck-select').value;
+            if (!targetDeck) return;
+
+            tempPreviewWords.forEach(word => {
+                appData[targetDeck].push(word);
+            });
+
+            safeSetStorage('anhwang_v13', JSON.stringify(appData));
+            alert(`Tuyệt vời! Đã lưu xong ${tempPreviewWords.length} thẻ có ảnh vào thư mục "${targetDeck}".`);
+            
+            // Xóa rỗng ô text và quay về bước 1
+            document.getElementById('bulk-input').value = "";
+            goBackToStep1();
+            updateDeckSelectors(targetDeck);
+        }
+
+        function goBackToStep1() {
+            document.getElementById('step-2-images').style.display = 'none';
+            document.getElementById('step-1-text').style.display = 'block';
+        }
+
+        // ================= LOGIC HỌC BÀI ================= //
         function triggerImageUpload(event) { event.stopPropagation(); document.getElementById('imageUploader').click(); }
         document.getElementById('imageUploader').addEventListener('change', function(e) {
             const file = e.target.files[0]; if (!file) return;
@@ -240,10 +381,10 @@
                     if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
                     canvas.width = img.width * scale; canvas.height = img.height * scale;
                     const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.5); 
+                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
                     sessionDeck[currentIndex].image_url = dataUrl; document.getElementById('front-image').src = dataUrl;
                     const cardIndex = appData[currentStudyDeck].findIndex(c => c.hanzi === sessionDeck[currentIndex].hanzi);
-                    if(cardIndex > -1) { appData[currentStudyDeck][cardIndex].image_url = dataUrl; try{localStorage.setItem('anhwang_final', JSON.stringify(appData));}catch(e){} }
+                    if(cardIndex > -1) { appData[currentStudyDeck][cardIndex].image_url = dataUrl; safeSetStorage('anhwang_v13', JSON.stringify(appData)); }
                 }
                 img.src = event.target.result;
             }
@@ -268,11 +409,6 @@
             if(window.speechSynthesis) { window.speechSynthesis.cancel(); let speech = new SpeechSynthesisUtterance(sessionDeck[currentIndex].hanzi); speech.lang = 'zh-CN'; speech.rate = 0.85; window.speechSynthesis.speak(speech); }
         }
 
-        function getPinyinColor(txt) {
-            if (/[āēīōūǖ]/.test(txt)) return "var(--danger)"; if (/[áéíóúǘ]/.test(txt)) return "var(--warning)";
-            if (/[ǎěǐǒǔǚ]/.test(txt)) return "var(--success)"; if (/[àèìòùǜ]/.test(txt)) return "var(--primary)"; return "#2c3e50";
-        }
-
         function loadCard(index) {
             if (index >= sessionDeck.length) {
                 if (hardReviewQueue.length > 0) { alert(`Còn ${hardReviewQueue.length} thẻ Khó. Cố lên anh!`); sessionDeck = [...hardReviewQueue]; hardReviewQueue = []; currentIndex = 0; loadCard(0); } 
@@ -280,8 +416,8 @@
             }
             const card = sessionDeck[index];
             document.getElementById('front-image').src = card.image_url; document.getElementById('back-hanzi').innerText = card.hanzi;
-            const pinyinEl = document.getElementById('back-pinyin'); pinyinEl.innerText = card.pinyin; pinyinEl.style.color = getPinyinColor(card.pinyin);
-            document.getElementById('back-meaning').innerText = card.meaning; document.getElementById('back-hanviet').innerText = card.han_viet || "";
+            document.getElementById('back-pinyin').innerText = card.pinyin;
+            document.getElementById('back-meaning').innerText = card.meaning;
             document.getElementById('stats').innerText = `Thẻ: ${index + 1} / ${sessionDeck.length}`;
             document.getElementById('flashcard').classList.remove('is-flipped'); isFlipped = false; document.getElementById('action-buttons').classList.remove('visible');
         }
@@ -300,13 +436,13 @@
             document.getElementById('stats').style.display = 'none'; document.getElementById('deck-selector-box').style.display = 'none'; 
             const endScreen = document.getElementById('end-screen'); endScreen.style.display = 'block';
             if (allEasy) {
-                endScreen.innerHTML = `<h2 style="color: var(--primary); margin-top: 0; font-size:26px; font-weight:900;">🏆 Đỉnh Quá Anh Wang!</h2><p style="color: #34495e; font-size: 15px; margin-bottom: 25px; font-weight: bold;">Toàn bộ từ vựng đã được anh chinh phục.</p><button style="width:100%; padding:15px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;" onclick="startStudySession()">Học lại trang này</button>`;
+                endScreen.innerHTML = `<h2 style="color: var(--primary); margin-top: 0;">🏆 Xuất Sắc!</h2><p style="color: #7f8c8d; font-size: 15px; margin-bottom: 25px;">Anh đã thuộc hết toàn bộ thẻ rồi.</p><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:15px; font-size:16px; font-weight:bold; cursor:pointer;" onclick="startStudySession()">Học lại trang này</button>`;
             } else {
-                let html = `<h2 style="color: var(--primary); margin-top: 0; font-size:22px; font-weight:900;">Bảng Tổng Kết</h2><div style="text-align: left; margin-top: 15px; margin-bottom: 20px; max-height: 300px; overflow-y: auto;">`;
+                let html = `<h2 style="color: var(--primary); margin-top: 0;">Bảng Tổng Kết</h2><div style="text-align: left; margin-top: 15px; margin-bottom: 20px; max-height: 300px; overflow-y: auto;">`;
                 normalSummaryList.forEach(card => {
-                    html += `<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: rgba(255,255,255,0.9); border-radius: 10px; border-left: 5px solid var(--warning);"><div style="flex: 1;"><strong style="font-size: 18px; color: #2c3e50;">${card.hanzi}</strong><span style="font-size: 13px; color: #d35400; display: block; font-weight:bold;">${card.pinyin}</span></div><div style="font-size: 14px; color: var(--primary); font-weight: bold;">${card.meaning}</div></div>`;
+                    html += `<div style="display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 12px; border-left: 4px solid var(--warning);"><div style="flex: 1;"><strong style="font-size: 18px; color: #2c3e50;">${card.hanzi}</strong><span style="font-size: 13px; color: #7f8c8d; display: block; font-weight:bold;">${card.pinyin}</span></div><div style="font-size: 15px; color: var(--primary); font-weight: bold;">${card.meaning}</div></div>`;
                 });
-                html += `</div><button style="width:100%; padding:15px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); color:white; border:none; border-radius:12px; font-size:16px; font-weight:bold; cursor:pointer;" onclick="startStudySession()">Học lại lần nữa</button>`;
+                html += `</div><button style="width:100%; padding:15px; background:var(--primary); color:white; border:none; border-radius:15px; font-size:16px; font-weight:bold; cursor:pointer;" onclick="startStudySession()">Học lại lần nữa</button>`;
                 endScreen.innerHTML = html;
             }
         }
