@@ -15,33 +15,37 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0; display: flex; justify-content: center; height: 100vh;
+            margin: 0; padding: 0; display: flex; justify-content: center; align-items: center; height: 100dvh;
             background: var(--bg-grad); color: var(--text-main);
             overflow: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        /* Khung giao diện giả lập App Mobile trên Desktop */
         #mobile-wrapper {
-            width: 100%; max-width: 450px; height: 100%; position: relative;
-            background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 30px rgba(0,0,0,0.1);
-            display: flex; flex-direction: column;
+            width: 100%; height: 100%; max-width: 600px; position: relative;
+            background: rgba(255, 255, 255, 0.35); display: flex; flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        @media (min-width: 650px) {
+            #mobile-wrapper {
+                height: 95vh; border-radius: 35px; overflow: hidden;
+                border: 5px solid rgba(255, 255, 255, 0.6);
+            }
         }
 
         #app-container { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
 
-        /* ================= UI DÙNG CHUNG ================= */
         .panel { background: white; padding: 22px; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-bottom: 20px; width: 100%; box-sizing: border-box;}
-        select, input[type="text"], textarea { outline: none; font-family: inherit; transition: 0.2s;}
+        select, input[type="text"], textarea { outline: none; font-family: inherit; transition: 0.2s; box-sizing: border-box;}
         button { cursor: pointer; transition: transform 0.1s, box-shadow 0.2s; }
         button:active { transform: scale(0.96); }
 
         /* ================= VIEW: HỌC BÀI ================= */
         #study-view { width: 100%; display: flex; flex-direction: column; align-items: center; }
-        
         .header-info { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
         .streak-badge { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); padding: 8px 20px; border-radius: 25px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); color: #d63031; }
 
-        .scene { width: 100%; height: 420px; perspective: 1000px; margin-bottom: 10px;}
+        .scene { width: 100%; height: 420px; perspective: 1000px; margin-bottom: 10px; max-height: 55vh; width: 100%;}
         .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
         .card.is-flipped { transform: rotateY(180deg); box-shadow: 0 15px 35px rgba(0,0,0,0.15);}
         
@@ -59,44 +63,53 @@
         .hint-text { color:#95a5a6; font-size:15px; font-weight:bold; margin-top:20px; animation: pulse 2s infinite; }
 
         .card-face-back { transform: rotateY(180deg); overflow-y: auto; justify-content: center;}
-        #hanzi-target { width: 140px; height: 140px; margin-top: 5px; border: 2px dashed #dfe6e9; border-radius: 15px; background: white;}
-        .pinyin { font-size: 30px; font-weight: 900; margin: 15px 0 10px 0; color: #2c3e50; letter-spacing: 1px;}
+        
+        /* Box vẽ chữ đa năng */
+        #hanzi-target { 
+            width: 100%; max-width: 280px; min-height: 120px;
+            margin-top: 5px; border: 2px dashed #dfe6e9; border-radius: 15px; 
+            background: white; display: flex; justify-content: center; align-items: center; 
+            flex-wrap: wrap; gap: 4px; padding: 10px; box-sizing: border-box;
+        }
+
+        .pinyin { font-size: 32px; font-weight: 900; margin: 15px 0 10px 0; color: #2c3e50; letter-spacing: 1px; text-align: center;}
         .meaning { font-size: 24px; font-weight: 800; color: var(--blue); margin-bottom: 25px; text-align: center;}
 
         .action-buttons { display: flex; gap: 10px; margin-top: 20px; width: 100%; opacity: 0; pointer-events: none; transition: 0.4s; transform: translateY(10px);}
         .action-buttons.visible { opacity: 1; pointer-events: auto; transform: translateY(0);}
         .action-buttons button { padding: 15px 5px; font-size: 14px; font-weight: 800; border: none; border-radius: 15px; color: white; flex: 1; box-shadow: 0 6px 15px rgba(0,0,0,0.15);}
-        
         .toggle-autoplay { margin-top: 15px; font-size: 14px; font-weight: 800; color: #34495e; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.6); padding: 8px 15px; border-radius: 20px;}
         
-        /* ================= VIEW: NHẬP LIỆU ================= */
-        #add-view { width: 100%; display: none; }
+        /* ================= VIEW: NHẬP LIỆU & QUẢN LÝ ================= */
+        #add-view, #manage-view { width: 100%; display: none; }
         textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 15px; font-size: 15px; background: #fdfdfd; resize: vertical; box-sizing: border-box; font-family: monospace;}
         textarea:focus { border-color: var(--blue); background: white;}
         
-        .word-list-container { max-height: 450px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; display: flex; flex-direction: column; gap: 12px;}
+        .word-list-container { max-height: 50vh; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; display: flex; flex-direction: column; gap: 12px;}
         .preview-item { display: flex; background: white; border-radius: 20px; padding: 15px; gap: 12px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f1f2f6; position: relative;}
-        .preview-inputs { flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .preview-inputs input { padding: 10px; border-radius: 10px; border: 1px solid #eee; font-size: 14px; background: #fdfdfd; font-weight: 600;}
+        .preview-inputs { flex: 1; display: flex; flex-direction: column; gap: 8px; width: 100%;}
+        .preview-inputs input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid #eee; font-size: 14px; background: #fdfdfd; font-weight: 600; box-sizing: border-box;}
         .preview-inputs input:focus { border-color: var(--blue); background: white;}
         
-        .img-box { width: 80px; height: 80px; border-radius: 15px; background: #f1f2f6; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; border: 2px dashed #bdc3c7; transition: 0.2s;}
+        .tools-bar { display: flex; gap: 5px; margin-top: 5px; width: 100%;}
+        .mini-btn { flex: 1; padding: 8px 4px; font-size: 11px; font-weight: 800; border-radius: 8px; border: none; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; gap:3px;}
+        .btn-gg { background: #4a90e2; } .btn-link { background: #f39c12; } .btn-up { background: #95a5a6; }
+
+        .img-box { width: 90px; height: 90px; border-radius: 15px; background: #f1f2f6; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; border: 2px dashed #bdc3c7; transition: 0.2s;}
         .img-box:active { transform: scale(0.9); }
         .img-box img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top:0; left:0; z-index: 1;}
         .img-box span { font-size: 24px; color: #95a5a6; z-index: 2;}
 
         .btn-del-card { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 8px rgba(255,107,107,0.4);}
 
-        /* ================= VIEW: QUẢN LÝ ================= */
-        #manage-view { width: 100%; display: none; }
         .stats-box { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); padding: 20px; border-radius: 20px; color: #2c3e50; margin-bottom: 20px; font-weight: bold; display: flex; justify-content: space-around; box-shadow: 0 8px 20px rgba(161, 196, 253, 0.4);}
         .stats-box div { text-align: center; }
         .stats-box span { display: block; font-size: 28px; font-weight: 900; color: #34495e; margin-top: 5px;}
 
-        /* TAB BAR NỔI (FLOATING) */
+        /* TAB BAR NỔI TỐI ƯU */
         .tab-bar { 
-            position: absolute; bottom: 20px; left: 20px; right: 20px; height: 75px; 
-            display: flex; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);
+            position: absolute; bottom: 15px; left: 15px; right: 15px; height: 75px; 
+            display: flex; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(20px);
             border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100;
             border: 1px solid rgba(255,255,255,0.8);
         }
@@ -132,7 +145,7 @@
                     </div>
                 </div>
 
-                <label class="toggle-autoplay">
+                <label class="toggle-autoplay" id="autoplay-container">
                     <input type="checkbox" id="autoplay-cb" checked style="width:18px; height:18px;"> Tự động phát âm khi lật thẻ
                 </label>
 
@@ -141,7 +154,8 @@
                     <button class="btn-good" style="background:var(--warning); color:#2c3e50" onclick="handleSRS(3)">🤔 Thường<br><span style="font-size:10px; font-weight:normal">Ngày mai ôn</span></button>
                     <button class="btn-easy" style="background:var(--primary-dark)" onclick="handleSRS(5)">🤩 Dễ<br><span style="font-size:10px; font-weight:normal">Nhớ rất lâu</span></button>
                 </div>
-                <div id="stats" style="margin-top:20px; font-weight:900; color: #2c3e50; font-size: 15px; background: rgba(255,255,255,0.6); padding: 8px 20px; border-radius: 20px;"></div>
+                
+                <div id="stats" style="margin-top:20px; text-align: center; width: 100%;"></div>
             </div>
 
             <div id="add-view">
@@ -203,10 +217,10 @@
     </div>
 
     <script>
-        let appData = {}; let currentDeck = ""; let sessionCards = []; let currentIndex = 0; let writer;
+        let appData = {}; let currentDeck = ""; let sessionCards = []; let currentIndex = 0; let hanziWriters = [];
         const defaultImg = "https://images.unsplash.com/photo-1515260268569-9271009adfdb?w=400";
 
-        // ================= XỬ LÝ ÂM THANH CHUẨN ĐA NỀN TẢNG (Khắc phục lỗi iOS) ================= //
+        // ================= XỬ LÝ ÂM THANH ================= //
         function initVoices() {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.getVoices();
@@ -219,20 +233,16 @@
         function playAudio(e) {
             if(e) e.stopPropagation();
             if ('speechSynthesis' in window) {
-                window.speechSynthesis.cancel(); // Xóa bộ đệm bị kẹt
+                window.speechSynthesis.cancel();
                 setTimeout(() => {
+                    if(currentIndex >= sessionCards.length) return;
                     const msg = new SpeechSynthesisUtterance(sessionCards[currentIndex].hanzi);
-                    msg.lang = 'zh-CN'; 
-                    msg.rate = 0.85; // Tốc độ chuẩn
-                    
+                    msg.lang = 'zh-CN'; msg.rate = 0.85; 
                     const voices = window.speechSynthesis.getVoices();
                     const zhVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'));
                     if (zhVoice) msg.voice = zhVoice;
-
                     window.speechSynthesis.speak(msg);
                 }, 50);
-            } else {
-                alert("Rất tiếc, trình duyệt của máy này không hỗ trợ đọc giọng nói.");
             }
         }
         function manualPlayAudio(e) { playAudio(e); }
@@ -279,21 +289,19 @@
         // ================= UI & DATA KHỞI TẠO ================= //
         function initApp() {
             initVoices();
-            const data = localStorage.getItem('anhwang_v18');
+            const data = localStorage.getItem('anhwang_v21');
             appData = data ? JSON.parse(data) : { "Từ vựng Boya 1": [] };
             updateDeckSelectors();
             updateStreak();
             
-            // Đánh thức iOS Audio Context khi người dùng chạm lần đầu vào màn hình
             document.body.addEventListener('touchstart', function() {
                 if ('speechSynthesis' in window) {
-                    let utterance = new SpeechSynthesisUtterance('');
-                    window.speechSynthesis.speak(utterance);
+                    let utterance = new SpeechSynthesisUtterance(''); window.speechSynthesis.speak(utterance);
                 }
             }, { once: true });
         }
 
-        function saveToStorage() { localStorage.setItem('anhwang_v18', JSON.stringify(appData)); }
+        function saveToStorage() { localStorage.setItem('anhwang_v21', JSON.stringify(appData)); }
 
         function switchTab(tab) {
             document.getElementById('study-view').style.display = tab === 'study' ? 'flex' : 'none';
@@ -320,7 +328,7 @@
             }
         }
 
-        // ================= LOGIC HỌC BÀI ================= //
+        // ================= LOGIC HỌC BÀI & HỌC LẠI TOÀN BỘ ================= //
         function startStudy() {
             currentDeck = document.getElementById('study-deck-select').value;
             if (!appData[currentDeck]) return;
@@ -330,26 +338,79 @@
             loadCard();
         }
 
+        function forceStudyAll() {
+            currentDeck = document.getElementById('study-deck-select').value;
+            if (!appData[currentDeck]) return;
+            sessionCards = [...appData[currentDeck]];
+            currentIndex = 0;
+            loadCard();
+        }
+
         function loadCard() {
             if (currentIndex >= sessionCards.length) {
                 document.getElementById('learning-area').style.display = 'none';
-                document.getElementById('stats').innerText = "🎉 Tuyệt vời! Anh đã hoàn thành mục tiêu hôm nay.";
+                document.getElementById('autoplay-container').style.display = 'none';
                 document.getElementById('action-buttons').classList.remove('visible');
+                
+                document.getElementById('stats').innerHTML = `
+                    <div style="font-size: 20px; margin-bottom: 25px; color: var(--blue);">🎉 Tuyệt vời!<br>Anh đã hoàn thành mục tiêu.</div>
+                    <button onclick="forceStudyAll()" style="width: 100%; padding: 18px; background: var(--blue); color: white; border: none; border-radius: 20px; font-weight: 900; font-size: 16px; box-shadow: 0 6px 20px rgba(74, 144, 226, 0.4);">🔄 ÔN TẬP LẠI TOÀN BỘ THẺ</button>
+                `;
                 return;
             }
+            
+            document.getElementById('autoplay-container').style.display = 'flex';
             const card = sessionCards[currentIndex];
             document.getElementById('learning-area').style.display = 'block';
             document.getElementById('front-image').src = card.image_url || defaultImg;
             document.getElementById('back-pinyin').innerText = card.pinyin;
             document.getElementById('back-meaning').innerText = card.meaning;
-            document.getElementById('stats').innerText = `Còn ${sessionCards.length - currentIndex} thẻ cần ôn`;
+            
+            document.getElementById('stats').innerHTML = `<span style="background: rgba(255,255,255,0.7); padding: 8px 20px; border-radius: 20px;">Còn ${sessionCards.length - currentIndex} thẻ cần ôn</span>`;
+            
             document.getElementById('flashcard').classList.remove('is-flipped');
             document.getElementById('action-buttons').classList.remove('visible');
             
-            document.getElementById('hanzi-target').innerHTML = '';
-            writer = HanziWriter.create('hanzi-target', card.hanzi, {
-                width: 140, height: 140, padding: 5, strokeAnimationSpeed: 1.5, delayBetweenStrokes: 150
-            });
+            // ================= SỬA LỖI HANZI WRITER NHIỀU CHỮ ================= //
+            const target = document.getElementById('hanzi-target');
+            target.innerHTML = '';
+            hanziWriters = []; // Reset mảng chứa nét vẽ
+            
+            const textToDraw = card.hanzi.replace(/\s+/g, ''); // Bỏ khoảng trắng
+            
+            // Nếu độ dài từ 5 chữ trở lên, KHÔNG vẽ nữa mà hiện dạng text in đậm
+            if (textToDraw.length > 4) {
+                target.innerHTML = `<div style="font-size:28px; font-weight:bold; color:#2c3e50; text-align:center;">${textToDraw}</div>`;
+            } else {
+                // Nếu 1-4 chữ, tự động chia nhỏ kích thước ô vẽ
+                let boxSize = 100;
+                if (textToDraw.length === 1) boxSize = 120;
+                else if (textToDraw.length === 2) boxSize = 80;
+                else if (textToDraw.length === 3) boxSize = 65;
+                else if (textToDraw.length === 4) boxSize = 55;
+                
+                for(let i = 0; i < textToDraw.length; i++) {
+                    const charDiv = document.createElement('div');
+                    charDiv.id = 'char-' + i;
+                    charDiv.style.width = boxSize + 'px';
+                    charDiv.style.height = boxSize + 'px';
+                    charDiv.style.display = 'flex';
+                    charDiv.style.justifyContent = 'center';
+                    charDiv.style.alignItems = 'center';
+                    target.appendChild(charDiv);
+                    
+                    // Chỉ vẽ nếu là bộ mã chữ Hán thật sự, nếu là dấu câu thì in thường
+                    if(/[\u4e00-\u9fa5]/.test(textToDraw[i])) {
+                        const writerInstance = HanziWriter.create(charDiv, textToDraw[i], {
+                            width: boxSize, height: boxSize, padding: 2, 
+                            strokeAnimationSpeed: 1.5, delayBetweenStrokes: 100
+                        });
+                        hanziWriters.push(writerInstance);
+                    } else {
+                        charDiv.innerHTML = `<span style="font-size:${boxSize*0.7}px; font-weight:bold; color:#2c3e50;">${textToDraw[i]}</span>`;
+                    }
+                }
+            }
         }
 
         function flipCard() {
@@ -357,131 +418,121 @@
             if (!flashcard.classList.contains('is-flipped')) {
                 flashcard.classList.add('is-flipped');
                 document.getElementById('action-buttons').classList.add('visible');
-                if (writer) writer.animateCharacter();
+                
+                // Vẽ ĐỒNG LOẠT nhiều chữ cùng 1 lúc
+                if (hanziWriters.length > 0) {
+                    hanziWriters.forEach(w => w.animateCharacter());
+                }
                 
                 if(document.getElementById('autoplay-cb').checked) { playAudio(null); }
             }
         }
 
-        // ================= XUẤT NHẬP FILE (ĐÃ SỬA LỖI 100%) ================= //
+        // ================= XUẤT NHẬP FILE ================= //
         function exportData() {
             try {
-                // Đóng gói dữ liệu thành chuỗi chuẩn JSON
-                const dataStr = JSON.stringify(appData, null, 2);
-                const blob = new Blob([dataStr], { type: "application/json" });
-                const url = URL.createObjectURL(blob);
-                
-                // Tạo link tải ảo và ép trình duyệt tải xuống (Tương thích tốt PC & Mobile)
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `TuVung_AnhWang_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-            } catch(error) {
-                alert("Lỗi khi xuất file: " + error);
-            }
+                const dataStr = JSON.stringify(appData, null, 2); const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = `TuVung_AnhWang_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
+            } catch(error) { alert("Lỗi khi xuất file: " + error); }
         }
 
         function importData(e) {
-            const file = e.target.files[0]; 
-            if(!file) return;
-            
-            const reader = new FileReader();
+            const file = e.target.files[0]; if(!file) return; const reader = new FileReader();
             reader.onload = (ev) => {
                 try {
-                    // PHẦN SỬA LỖI: Cố gắng phân tích cú pháp chuỗi văn bản lấy từ file
                     const parsedData = JSON.parse(ev.target.result);
                     if(typeof parsedData === 'object' && parsedData !== null) {
-                        appData = parsedData; 
-                        saveToStorage(); 
-                        updateDeckSelectors(); 
-                        alert("🎉 Nhập dữ liệu thành công! Toàn bộ từ vựng đã được khôi phục.");
-                    } else {
-                        alert("File không chứa dữ liệu hợp lệ.");
-                    }
-                } catch(error) {
-                    alert("❌ Lỗi đọc file! Vui lòng đảm bảo anh đang chọn đúng file .json được xuất từ ứng dụng này.");
-                }
-            };
-            // PHẦN SỬA LỖI QUAN TRỌNG NHẤT: Đọc file dưới dạng Text thay vì DataURL
-            reader.readAsText(file); 
-            e.target.value = ""; // Reset input để có thể chọn lại cùng 1 file nếu cần
+                        appData = parsedData; saveToStorage(); updateDeckSelectors(); alert("🎉 Nhập dữ liệu thành công!");
+                    } else { alert("File không hợp lệ."); }
+                } catch(error) { alert("❌ Lỗi đọc file!"); }
+            }; reader.readAsText(file); e.target.value = ""; 
         }
 
+        // ================= TÌM KIẾM & DÁN LINK ẢNH (BẢN SỬA LỖI) ================= //
+        function searchGoogle(query) { window.open(`https://www.google.com/search?tbm=isch&q=${encodeURIComponent(query)}`, '_blank'); }
+        
+        function pasteLink(type, deckOrIndex, index) {
+            // Mẹo: Người dùng cần chọn "Sao chép địa chỉ hình ảnh" chứ không phải copy link trang web
+            const url = prompt("🔗 Dán Link ảnh (Nhớ chọn 'Sao chép địa chỉ hình ảnh'):");
+            if(url && url.trim() !== "") {
+                const cleanUrl = url.trim();
+                if(type === 'temp') {
+                    tempWords[deckOrIndex].image_url = cleanUrl;
+                    const pImg = document.getElementById('prev-img-' + deckOrIndex); 
+                    pImg.src = cleanUrl; 
+                    pImg.style.display = 'block';
+                    
+                    // Sửa lỗi UI: Ẩn cục camera và viền đi khi dán link thành công
+                    const camIcon = pImg.parentElement.querySelector('span');
+                    if(camIcon) camIcon.style.display = 'none';
+                    pImg.parentElement.style.border = 'none';
 
-        // ================= LOGIC QUẢN LÝ & CHỈNH SỬA ================= //
+                    // Xử lý lỗi nếu link bị chặn (CORS) hoặc bị hỏng
+                    pImg.onerror = function() { 
+                        alert("⚠️ Rất tiếc! Trang web chứa ảnh này chặn không cho ứng dụng khác mượn ảnh. Xin hãy tra hình khác hoặc dùng 📷 File tải lên."); 
+                        this.src = defaultImg; 
+                        tempWords[deckOrIndex].image_url = defaultImg; 
+                    };
+
+                } else if (type === 'manage') {
+                    appData[deckOrIndex][index].image_url = cleanUrl; 
+                    saveToStorage(); 
+                    const mImg = document.getElementById('manage-img-' + index);
+                    mImg.src = cleanUrl;
+                    mImg.onerror = function() { alert("⚠️ Link ảnh bị lỗi hoặc bị chặn hiển thị."); this.src = defaultImg; appData[deckOrIndex][index].image_url = defaultImg; saveToStorage(); };
+                }
+            }
+        }
+
+        // ================= QUẢN LÝ THẺ ================= //
         function renderManageList() {
-            const deckName = document.getElementById('manage-deck-select').value;
-            const listEl = document.getElementById('manage-list');
-            listEl.innerHTML = '';
+            const deckName = document.getElementById('manage-deck-select').value; const listEl = document.getElementById('manage-list'); listEl.innerHTML = '';
             if(!deckName || !appData[deckName]) return;
-
-            const cards = appData[deckName];
-            const now = Date.now();
+            const cards = appData[deckName]; const now = Date.now();
             let mastered = cards.filter(c => c.nextReview && c.nextReview > now).length;
             
-            document.getElementById('manage-stats').innerHTML = `
-                <div>Tổng số từ<span>${cards.length}</span></div>
-                <div>Đã thuộc lòng<span>${mastered}</span></div>
-            `;
+            document.getElementById('manage-stats').innerHTML = `<div>Tổng số từ<span>${cards.length}</span></div><div>Đã thuộc lòng<span>${mastered}</span></div>`;
 
             cards.forEach((w, i) => {
-                const div = document.createElement('div');
-                div.className = 'preview-item';
+                const div = document.createElement('div'); div.className = 'preview-item';
                 div.innerHTML = `
                     <button class="btn-del-card" onclick="deleteOldCard('${deckName}', ${i})">✕</button>
                     <div class="preview-inputs">
                         <input type="text" value="${w.hanzi}" class="editing" onchange="updateOldCard('${deckName}', ${i}, 'hanzi', this.value)" placeholder="Chữ Hán">
                         <input type="text" value="${w.pinyin}" class="editing" onchange="updateOldCard('${deckName}', ${i}, 'pinyin', this.value)" placeholder="Pinyin">
                         <input type="text" value="${w.meaning}" class="editing" onchange="updateOldCard('${deckName}', ${i}, 'meaning', this.value)" placeholder="Nghĩa">
+                        <div class="tools-bar">
+                            <button class="mini-btn btn-gg" onclick="searchGoogle('${w.hanzi} ${w.meaning}')">🔍 Tra ảnh</button>
+                            <button class="mini-btn btn-link" onclick="pasteLink('manage', '${deckName}', ${i})">🔗 Link</button>
+                            <button class="mini-btn btn-up" onclick="this.nextElementSibling.click()">📷 File</button>
+                            <input type="file" accept="image/*" style="display:none" onchange="uploadManageImg(this, '${deckName}', ${i})">
+                        </div>
                     </div>
-                    <div class="img-box" onclick="this.querySelector('input').click()">
-                        <img src="${w.image_url || defaultImg}" style="display:block;" id="manage-img-${i}">
-                        <input type="file" accept="image/*" style="display:none" onchange="uploadManageImg(this, '${deckName}', ${i})">
-                    </div>
-                `;
-                listEl.appendChild(div);
+                    <div class="img-box"><img src="${w.image_url || defaultImg}" style="display:block;" id="manage-img-${i}"></div>
+                `; listEl.appendChild(div);
             });
         }
 
         function updateOldCard(deck, index, field, value) { appData[deck][index][field] = value; saveToStorage(); }
-
-        function deleteOldCard(deck, index) {
-            if(confirm("Anh có chắc chắn muốn xóa thẻ này vĩnh viễn không?")) {
-                appData[deck].splice(index, 1); saveToStorage(); renderManageList(); updateDeckSelectors();
-            }
-        }
-
+        function deleteOldCard(deck, index) { if(confirm("Xóa thẻ này vĩnh viễn?")) { appData[deck].splice(index, 1); saveToStorage(); renderManageList(); updateDeckSelectors(); } }
         function uploadManageImg(input, deck, index) {
             const file = input.files[0]; if(!file) return; const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 300; let scale = 1;
-                    if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
-                    canvas.width = img.width * scale; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
-                    appData[deck][index].image_url = dataUrl; saveToStorage(); document.getElementById('manage-img-' + index).src = dataUrl;
-                }
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file); input.value = "";
+            reader.onload = (e) => { const img = new Image(); img.onload = function() {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 300; let scale = 1; if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
+                canvas.width = img.width * scale; canvas.height = img.height * scale; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                appData[deck][index].image_url = dataUrl; saveToStorage(); document.getElementById('manage-img-' + index).src = dataUrl;
+            }; img.src = e.target.result; }; reader.readAsDataURL(file); input.value = "";
         }
 
         // ================= NHẬP LIỆU BƯỚC 1 -> 2 ================= //
         let tempWords = [];
         function goToStep2() {
-            const text = document.getElementById('bulk-input').value.trim();
-            if(!text) return alert("Anh chưa gõ chữ nào cả!");
-            
+            const text = document.getElementById('bulk-input').value.trim(); if(!text) return alert("Anh chưa gõ chữ nào cả!");
             tempWords = text.split('\n').map(line => {
-                const p = line.split('|').map(s => s.trim());
-                return { hanzi: p[0], pinyin: p[1]||"", meaning: p[2]||"", image_url: defaultImg, nextReview: 0 };
+                const p = line.split('|').map(s => s.trim()); return { hanzi: p[0], pinyin: p[1]||"", meaning: p[2]||"", image_url: defaultImg, nextReview: 0 };
             }).filter(w => w.hanzi !== "");
-
             if (tempWords.length === 0) return alert("Sai cú pháp nhập rồi anh ơi!");
 
             const list = document.getElementById('preview-list'); list.innerHTML = '';
@@ -492,13 +543,15 @@
                         <input type="text" value="${w.hanzi}" class="editing" onchange="tempWords[${i}].hanzi=this.value" placeholder="Chữ Hán">
                         <input type="text" value="${w.pinyin}" class="editing" onchange="tempWords[${i}].pinyin=this.value" placeholder="Pinyin">
                         <input type="text" value="${w.meaning}" class="editing" onchange="tempWords[${i}].meaning=this.value" placeholder="Nghĩa">
+                        <div class="tools-bar">
+                            <button class="mini-btn btn-gg" onclick="searchGoogle('${w.hanzi} ${w.meaning}')">🔍 Tra ảnh</button>
+                            <button class="mini-btn btn-link" onclick="pasteLink('temp', ${i})">🔗 Link</button>
+                            <button class="mini-btn btn-up" onclick="this.nextElementSibling.click()">📷 File</button>
+                            <input type="file" accept="image/*" style="display:none" onchange="uploadRowImg(this, ${i})">
+                        </div>
                     </div>
-                    <div class="img-box" onclick="this.querySelector('input').click()">
-                        <img src="" id="prev-img-${i}"><span>📷</span>
-                        <input type="file" accept="image/*" style="display:none" onchange="uploadRowImg(this, ${i})">
-                    </div>
-                `;
-                list.appendChild(div);
+                    <div class="img-box"><img src="" id="prev-img-${i}"><span>📷</span></div>
+                `; list.appendChild(div);
             });
             document.getElementById('step-1').style.display = 'none'; document.getElementById('step-2').style.display = 'block';
         }
@@ -507,22 +560,14 @@
 
         function uploadRowImg(input, i) {
             const file = input.files[0]; if(!file) return; const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.onload = function() {
-                    const canvas = document.createElement('canvas'); const MAX_WIDTH = 300; let scale = 1;
-                    if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
-                    canvas.width = img.width * scale; canvas.height = img.height * scale;
-                    const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                    const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
-                    tempWords[i].image_url = dataUrl;
-                    const previewImg = document.getElementById('prev-img-' + i);
-                    previewImg.src = dataUrl; previewImg.style.display = 'block';
-                    input.parentElement.querySelector('span').style.display = 'none'; input.parentElement.style.border = 'none';
-                }
-                img.src = e.target.result;
-            };
-            reader.readAsDataURL(file); input.value = "";
+            reader.onload = (e) => { const img = new Image(); img.onload = function() {
+                const canvas = document.createElement('canvas'); const MAX_WIDTH = 300; let scale = 1; if (img.width > MAX_WIDTH) { scale = MAX_WIDTH / img.width; }
+                canvas.width = img.width * scale; canvas.height = img.height * scale; const ctx = canvas.getContext('2d'); ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.6); 
+                tempWords[i].image_url = dataUrl;
+                const pImg = document.getElementById('prev-img-' + i); pImg.src = dataUrl; pImg.style.display = 'block';
+                input.parentElement.querySelector('span').style.display = 'none'; input.parentElement.style.border = 'none';
+            }; img.src = e.target.result; }; reader.readAsDataURL(file); input.value = "";
         }
 
         function saveFinalData() {
