@@ -3,178 +3,202 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Flashcard Tiếng Trung Pro - Anh Wang</title>
+    <title>Học Tiếng Trung Pro - Anh Wang</title>
     <script src="https://cdn.jsdelivr.net/npm/hanzi-writer@3.5/dist/hanzi-writer.min.js"></script>
     <style>
         :root {
-            --primary: #5cdb5c; --primary-dark: #4bba4b; --danger: #ff6b6b; --warning: #feca57; --blue: #3498db;
-            --bg-color: #ffd6e8; --card-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #2c3e50; --glass-blur: 15px;
+            --primary: #5cdb5c; --primary-dark: #4bba4b; --danger: #ff6b6b; --warning: #feca57; --blue: #4a90e2;
+            --bg-grad: linear-gradient(135deg, #ff9a9e 0%, #fecfef 99%, #fecfef 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #2c3e50; --glass-blur: 20px;
         }
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            margin: 0; padding: 0; display: flex; flex-direction: column; height: 100vh;
-            background-color: var(--bg-color); color: var(--text-main); transition: 0.3s;
+            margin: 0; padding: 0; display: flex; justify-content: center; height: 100vh;
+            background: var(--bg-grad); color: var(--text-main);
             overflow: hidden; -webkit-tap-highlight-color: transparent;
         }
 
-        #app-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; display: flex; flex-direction: column; align-items: center; }
+        /* Khung giao diện giả lập App Mobile trên Desktop */
+        #mobile-wrapper {
+            width: 100%; max-width: 450px; height: 100%; position: relative;
+            background: rgba(255, 255, 255, 0.2); box-shadow: 0 0 30px rgba(0,0,0,0.1);
+            display: flex; flex-direction: column;
+        }
+
+        #app-container { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; display: flex; flex-direction: column; align-items: center; }
 
         /* ================= UI DÙNG CHUNG ================= */
-        .panel { background: white; padding: 20px; border-radius: 25px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); margin-bottom: 20px; width: 100%; max-width: 400px; box-sizing: border-box;}
-        select, input[type="text"], textarea { outline: none; font-family: inherit; }
-        
-        /* ================= VIEW: HỌC BÀI ================= */
-        #study-view { width: 100%; max-width: 400px; display: flex; flex-direction: column; align-items: center; }
-        
-        .header-info { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .streak-badge { background: white; padding: 5px 15px; border-radius: 20px; font-weight: 800; font-size: 13px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); color: #e67e22; }
+        .panel { background: white; padding: 22px; border-radius: 25px; box-shadow: 0 8px 25px rgba(0,0,0,0.06); margin-bottom: 20px; width: 100%; box-sizing: border-box;}
+        select, input[type="text"], textarea { outline: none; font-family: inherit; transition: 0.2s;}
+        button { cursor: pointer; transition: transform 0.1s, box-shadow 0.2s; }
+        button:active { transform: scale(0.96); }
 
-        .scene { width: 100%; height: 400px; perspective: 1000px; }
-        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; border-radius: 25px; }
-        .card.is-flipped { transform: rotateY(180deg); }
+        /* ================= VIEW: HỌC BÀI ================= */
+        #study-view { width: 100%; display: flex; flex-direction: column; align-items: center; }
+        
+        .header-info { width: 100%; display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .streak-badge { background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); padding: 8px 20px; border-radius: 25px; font-weight: 900; font-size: 14px; box-shadow: 0 4px 15px rgba(255, 154, 158, 0.4); color: #d63031; }
+
+        .scene { width: 100%; height: 420px; perspective: 1000px; margin-bottom: 10px;}
+        .card { width: 100%; height: 100%; position: relative; transition: transform 0.6s cubic-bezier(0.4, 0.2, 0.2, 1); transform-style: preserve-3d; cursor: pointer; border-radius: 30px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); }
+        .card.is-flipped { transform: rotateY(180deg); box-shadow: 0 15px 35px rgba(0,0,0,0.15);}
         
         .card-face {
             position: absolute; width: 100%; height: 100%; -webkit-backface-visibility: hidden; backface-visibility: hidden;
-            border-radius: 25px; background: var(--card-bg); backdrop-filter: blur(var(--glass-blur));
-            display: flex; flex-direction: column; align-items: center; padding: 20px; box-sizing: border-box;
-            border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-radius: 30px; background: var(--card-bg); backdrop-filter: blur(var(--glass-blur));
+            display: flex; flex-direction: column; align-items: center; padding: 25px; box-sizing: border-box;
+            border: 2px solid rgba(255,255,255,0.6);
         }
         
-        .card-face-front { justify-content: flex-start; }
-        .front-image { width: 100%; height: 80%; object-fit: cover; border-radius: 15px; background-color: #eee;}
+        .card-face-front { justify-content: center; }
+        .front-image { width: 100%; height: 85%; object-fit: cover; border-radius: 20px; box-shadow: 0 8px 20px rgba(0,0,0,0.08); background-color: #f1f2f6;}
         
-        .card-face-back { transform: rotateY(180deg); overflow-y: auto; justify-content: center;}
-        #hanzi-target { width: 120px; height: 120px; margin-top: 5px; border: 1px dashed #ccc; border-radius: 10px; }
-        .pinyin { font-size: 26px; font-weight: bold; margin: 15px 0 10px 0; color: #34495e;}
-        .meaning { font-size: 24px; font-weight: 900; color: #e74c3c; margin-bottom: 15px;}
+        @keyframes pulse { 0% { opacity: 0.6; } 50% { opacity: 1; transform: scale(1.02); } 100% { opacity: 0.6; } }
+        .hint-text { color:#95a5a6; font-size:15px; font-weight:bold; margin-top:20px; animation: pulse 2s infinite; }
 
-        .action-buttons { display: flex; gap: 8px; margin-top: 15px; width: 100%; opacity: 0; pointer-events: none; transition: 0.3s; }
-        .action-buttons.visible { opacity: 1; pointer-events: auto; }
-        .action-buttons button { padding: 12px 5px; font-size: 13px; font-weight: bold; border: none; border-radius: 12px; color: white; flex: 1; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        .card-face-back { transform: rotateY(180deg); overflow-y: auto; justify-content: center;}
+        #hanzi-target { width: 140px; height: 140px; margin-top: 5px; border: 2px dashed #dfe6e9; border-radius: 15px; background: white;}
+        .pinyin { font-size: 30px; font-weight: 900; margin: 15px 0 10px 0; color: #2c3e50; letter-spacing: 1px;}
+        .meaning { font-size: 24px; font-weight: 800; color: var(--blue); margin-bottom: 25px; text-align: center;}
+
+        .action-buttons { display: flex; gap: 10px; margin-top: 20px; width: 100%; opacity: 0; pointer-events: none; transition: 0.4s; transform: translateY(10px);}
+        .action-buttons.visible { opacity: 1; pointer-events: auto; transform: translateY(0);}
+        .action-buttons button { padding: 15px 5px; font-size: 14px; font-weight: 800; border: none; border-radius: 15px; color: white; flex: 1; box-shadow: 0 6px 15px rgba(0,0,0,0.15);}
         
-        .toggle-autoplay { margin-top: 15px; font-size: 13px; font-weight: bold; color: #7f8c8d; display: flex; align-items: center; gap: 5px;}
+        .toggle-autoplay { margin-top: 15px; font-size: 14px; font-weight: 800; color: #34495e; display: flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.6); padding: 8px 15px; border-radius: 20px;}
         
         /* ================= VIEW: NHẬP LIỆU ================= */
-        #add-view { width: 100%; max-width: 400px; display: none; }
-        textarea { width: 100%; padding: 15px; border: 1px solid #ddd; border-radius: 15px; font-size: 14px; background: #f9f9f9; resize: vertical; box-sizing: border-box;}
+        #add-view { width: 100%; display: none; }
+        textarea { width: 100%; padding: 15px; border: 2px solid #eee; border-radius: 15px; font-size: 15px; background: #fdfdfd; resize: vertical; box-sizing: border-box; font-family: monospace;}
+        textarea:focus { border-color: var(--blue); background: white;}
         
-        .word-list-container { max-height: 450px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px;}
-        .preview-item { display: flex; background: white; border-radius: 15px; padding: 12px; margin-bottom: 12px; gap: 10px; align-items: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee; position: relative;}
-        .preview-inputs { flex: 1; display: flex; flex-direction: column; gap: 6px; }
-        .preview-inputs input { padding: 8px; border-radius: 8px; border: 1px solid transparent; font-size: 14px; background: #fdfdfd; transition: 0.2s; font-weight: 500;}
+        .word-list-container { max-height: 450px; overflow-y: auto; margin-bottom: 15px; padding-right: 5px; display: flex; flex-direction: column; gap: 12px;}
+        .preview-item { display: flex; background: white; border-radius: 20px; padding: 15px; gap: 12px; align-items: center; box-shadow: 0 4px 12px rgba(0,0,0,0.05); border: 1px solid #f1f2f6; position: relative;}
+        .preview-inputs { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .preview-inputs input { padding: 10px; border-radius: 10px; border: 1px solid #eee; font-size: 14px; background: #fdfdfd; font-weight: 600;}
         .preview-inputs input:focus { border-color: var(--blue); background: white;}
-        .preview-inputs input.editing { border: 1px solid #ddd; }
         
-        .img-box { width: 70px; height: 70px; border-radius: 10px; background: #f1f2f6; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; border: 2px dashed #bdc3c7;}
+        .img-box { width: 80px; height: 80px; border-radius: 15px; background: #f1f2f6; cursor: pointer; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; flex-shrink: 0; border: 2px dashed #bdc3c7; transition: 0.2s;}
+        .img-box:active { transform: scale(0.9); }
         .img-box img { width: 100%; height: 100%; object-fit: cover; display: none; position: absolute; top:0; left:0; z-index: 1;}
-        .img-box span { font-size: 20px; color: #95a5a6; z-index: 2;}
+        .img-box span { font-size: 24px; color: #95a5a6; z-index: 2;}
 
-        .btn-del-card { position: absolute; top: -5px; right: -5px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 22px; height: 22px; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 10;}
+        .btn-del-card { position: absolute; top: -8px; right: -8px; background: var(--danger); color: white; border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 14px; font-weight: bold; display: flex; align-items: center; justify-content: center; z-index: 10; box-shadow: 0 4px 8px rgba(255,107,107,0.4);}
 
         /* ================= VIEW: QUẢN LÝ ================= */
-        #manage-view { width: 100%; max-width: 400px; display: none; }
-        .stats-box { background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); padding: 15px; border-radius: 15px; color: #2c3e50; margin-bottom: 15px; font-weight: bold; display: flex; justify-content: space-around; box-shadow: 0 4px 10px rgba(0,0,0,0.1);}
+        #manage-view { width: 100%; display: none; }
+        .stats-box { background: linear-gradient(135deg, #a1c4fd 0%, #c2e9fb 100%); padding: 20px; border-radius: 20px; color: #2c3e50; margin-bottom: 20px; font-weight: bold; display: flex; justify-content: space-around; box-shadow: 0 8px 20px rgba(161, 196, 253, 0.4);}
         .stats-box div { text-align: center; }
-        .stats-box span { display: block; font-size: 22px; font-weight: 900;}
+        .stats-box span { display: block; font-size: 28px; font-weight: 900; color: #34495e; margin-top: 5px;}
 
-        /* TAB BAR */
-        .tab-bar { position: fixed; bottom: 0; left: 0; width: 100%; height: 75px; display: flex; background: white; border-top-left-radius: 20px; border-top-right-radius: 20px; box-shadow: 0 -5px 15px rgba(0,0,0,0.05); z-index: 100;}
-        .tab-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; font-weight: bold; color: #bdc3c7; cursor: pointer; transition: 0.2s;}
-        .tab-item.active { color: var(--blue); transform: translateY(-2px);}
-        .tab-icon { font-size: 22px; margin-bottom: 3px; }
+        /* TAB BAR NỔI (FLOATING) */
+        .tab-bar { 
+            position: absolute; bottom: 20px; left: 20px; right: 20px; height: 75px; 
+            display: flex; background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(20px);
+            border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); z-index: 100;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+        .tab-item { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; font-size: 11px; font-weight: 900; color: #a4b0be; cursor: pointer; transition: 0.3s;}
+        .tab-item.active { color: var(--blue); transform: translateY(-3px);}
+        .tab-icon { font-size: 24px; margin-bottom: 4px; transition: 0.3s;}
+        .tab-item.active .tab-icon { transform: scale(1.15); }
     </style>
 </head>
 <body>
 
-    <div id="app-container">
-        <div id="study-view">
-            <div class="header-info">
-                <div class="streak-badge" id="streak-display">🔥 Streak: 0 ngày</div>
-            </div>
-            
-            <select id="study-deck-select" onchange="changeStudyDeck()" style="width:100%; padding:12px; border-radius:15px; border:none; margin-bottom:15px; font-weight:bold; box-shadow: 0 4px 10px rgba(0,0,0,0.05); background: white; color: var(--blue);"></select>
-
-            <div class="scene" id="learning-area">
-                <div class="card" id="flashcard" onclick="flipCard()">
-                    <div class="card-face card-face-front">
-                        <img id="front-image" class="front-image" src="" alt="Hình">
-                        <p style="color:#95a5a6; font-size:14px; font-weight:bold; margin-top:20px;">👇 Chạm để lật thẻ</p>
-                    </div>
-                    <div class="card-face card-face-back">
-                        <div id="hanzi-target"></div>
-                        <div class="pinyin" id="back-pinyin"></div>
-                        <div class="meaning" id="back-meaning"></div>
-                        <button onclick="manualPlayAudio(event)" style="padding:8px 25px; border-radius:20px; border:1px solid #ddd; background:#f8f9fa; font-weight:bold; cursor:pointer; color:#2c3e50;">🔊 Đọc lại</button>
-                    </div>
+    <div id="mobile-wrapper">
+        <div id="app-container">
+            <div id="study-view">
+                <div class="header-info">
+                    <div class="streak-badge" id="streak-display">🔥 Cố lên Anh Wang!</div>
                 </div>
-            </div>
-
-            <label class="toggle-autoplay">
-                <input type="checkbox" id="autoplay-cb" checked> Tự động phát âm khi lật thẻ
-            </label>
-
-            <div class="action-buttons" id="action-buttons">
-                <button class="btn-hard" style="background:var(--danger)" onclick="handleSRS(1)">Khó (Lặp lại)</button>
-                <button class="btn-good" style="background:var(--warning); color:#333" onclick="handleSRS(3)">Bình thường</button>
-                <button class="btn-easy" style="background:var(--primary-dark)" onclick="handleSRS(5)">Dễ (Nhớ lâu)</button>
-            </div>
-            <div id="stats" style="margin-top:15px; font-weight:bold; color: #7f8c8d;"></div>
-        </div>
-
-        <div id="add-view">
-            <div id="step-1" class="panel">
-                <h3 style="margin-top: 0; color: var(--blue);">Thêm Từ Nhanh</h3>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <select id="add-deck-select" style="flex:1; padding:10px; border-radius:10px; border: 1px solid #dfe6e9; font-weight:bold; color:var(--blue);"></select>
-                    <button onclick="promptCreateDeck()" style="padding:0 15px; background:var(--blue); color:white; border:none; border-radius:10px; font-weight:bold;">+ Mới</button>
-                </div>
-                <p style="font-size:12px; color:#e67e22; font-weight:bold; margin-bottom: 5px;">Cú pháp: Chữ | Pinyin | Nghĩa</p>
-                <textarea id="bulk-input" rows="7" placeholder="家 | jiā | Nhà&#10;书 | shū | Sách"></textarea>
-                <button onclick="goToStep2()" style="width:100%; padding:15px; background:var(--blue); color:white; border:none; border-radius:15px; margin-top:15px; font-weight:900; box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);">➡️ TIẾP TỤC: CHỌN ẢNH</button>
                 
-                <div style="margin-top:20px; display:flex; gap:10px;">
-                    <button onclick="exportData()" style="flex:1; font-size:12px; padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-weight:bold;">📥 Xuất File</button>
-                    <button onclick="document.getElementById('import-file').click()" style="flex:1; font-size:12px; padding:10px; border-radius:10px; border:1px solid #ddd; background:white; font-weight:bold;">📤 Nhập File</button>
-                    <input type="file" id="import-file" style="display:none" onchange="importData(event)">
+                <select id="study-deck-select" onchange="changeStudyDeck()" style="width:100%; padding:15px; border-radius:20px; border:none; margin-bottom:15px; font-weight:900; font-size:16px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); background: white; color: var(--blue); text-align:center; appearance: none;"></select>
+
+                <div class="scene" id="learning-area">
+                    <div class="card" id="flashcard" onclick="flipCard()">
+                        <div class="card-face card-face-front">
+                            <img id="front-image" class="front-image" src="" alt="Hình">
+                            <p class="hint-text">👇 Chạm nhẹ để lật thẻ</p>
+                        </div>
+                        <div class="card-face card-face-back">
+                            <div id="hanzi-target"></div>
+                            <div class="pinyin" id="back-pinyin"></div>
+                            <div class="meaning" id="back-meaning"></div>
+                            <button onclick="manualPlayAudio(event)" style="padding:12px 30px; border-radius:25px; border:none; background:linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%); font-weight:900; color:#2c3e50; font-size: 15px; box-shadow: 0 6px 15px rgba(142, 197, 252, 0.4);">🔊 Phát Âm Lại</button>
+                        </div>
+                    </div>
+                </div>
+
+                <label class="toggle-autoplay">
+                    <input type="checkbox" id="autoplay-cb" checked style="width:18px; height:18px;"> Tự động phát âm khi lật thẻ
+                </label>
+
+                <div class="action-buttons" id="action-buttons">
+                    <button class="btn-hard" style="background:var(--danger)" onclick="handleSRS(1)">😓 Khó<br><span style="font-size:10px; font-weight:normal">Học lại ngay</span></button>
+                    <button class="btn-good" style="background:var(--warning); color:#2c3e50" onclick="handleSRS(3)">🤔 Thường<br><span style="font-size:10px; font-weight:normal">Ngày mai ôn</span></button>
+                    <button class="btn-easy" style="background:var(--primary-dark)" onclick="handleSRS(5)">🤩 Dễ<br><span style="font-size:10px; font-weight:normal">Nhớ rất lâu</span></button>
+                </div>
+                <div id="stats" style="margin-top:20px; font-weight:900; color: #2c3e50; font-size: 15px; background: rgba(255,255,255,0.6); padding: 8px 20px; border-radius: 20px;"></div>
+            </div>
+
+            <div id="add-view">
+                <div id="step-1" class="panel">
+                    <h3 style="margin-top: 0; color: var(--blue); font-size: 20px; font-weight: 900;">⚡ Thêm Từ Vựng Mới</h3>
+                    <div style="display:flex; gap:10px; margin-bottom:15px;">
+                        <select id="add-deck-select" style="flex:1; padding:12px; border-radius:12px; border: 2px solid #f1f2f6; font-weight:800; color:var(--text-main);"></select>
+                        <button onclick="promptCreateDeck()" style="padding:0 20px; background:var(--blue); color:white; border:none; border-radius:12px; font-weight:900;">+ TẠO THƯ MỤC</button>
+                    </div>
+                    <div style="background: #fff3cd; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-left: 4px solid #feca57;">
+                        <p style="font-size:13px; color:#d35400; font-weight:bold; margin: 0;">Cú pháp nhập (mỗi từ 1 dòng):<br><span style="color:#2c3e50;">Chữ Hán | Pinyin | Nghĩa</span></p>
+                    </div>
+                    <textarea id="bulk-input" rows="6" placeholder="苹果 | píng guǒ | Quả táo&#10;书 | shū | Cuốn sách"></textarea>
+                    <button onclick="goToStep2()" style="width:100%; padding:18px; background:var(--blue); color:white; border:none; border-radius:18px; margin-top:20px; font-weight:900; font-size: 16px; box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);">➡️ CHUYỂN SANG BƯỚC GẮN ẢNH</button>
+                    
+                    <div style="margin-top:25px; display:flex; gap:12px;">
+                        <button onclick="exportData()" style="flex:1; font-size:13px; padding:12px; border-radius:12px; border:2px solid #dfe6e9; background:white; font-weight:800; color: #2c3e50;">📥 XUẤT FILE</button>
+                        <button onclick="document.getElementById('import-file').click()" style="flex:1; font-size:13px; padding:12px; border-radius:12px; border:2px solid #dfe6e9; background:white; font-weight:800; color: #2c3e50;">📤 NHẬP FILE</button>
+                        <input type="file" id="import-file" accept=".json" style="display:none" onchange="importData(event)">
+                    </div>
+                </div>
+
+                <div id="step-2" style="display:none;">
+                    <div class="panel" style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px;">
+                        <h4 style="margin:0; color: #2c3e50; font-size: 18px; font-weight: 900;">🎨 Gắn ảnh minh họa</h4>
+                        <button onclick="goBackToStep1()" style="background:none; border:none; color:var(--blue); text-decoration:underline; font-weight:800; font-size:14px;">Quay lại sửa chữ</button>
+                    </div>
+                    <div id="preview-list" class="word-list-container"></div>
+                    <button onclick="saveFinalData()" style="width:100%; padding:20px; background:var(--primary-dark); color:white; border:none; border-radius:20px; font-weight:900; font-size:16px; box-shadow:0 8px 25px rgba(92,219,92,0.4);">✨ CHỐT LƯU VÀO MÁY</button>
                 </div>
             </div>
 
-            <div id="step-2" style="display:none;">
-                <div class="panel" style="display:flex; justify-content:space-between; align-items:center; padding:15px 20px;">
-                    <h4 style="margin:0; color: #2c3e50;">Gắn ảnh & Chỉnh sửa</h4>
-                    <button onclick="goBackToStep1()" style="background:none; border:none; color:var(--blue); text-decoration:underline; font-weight:bold; cursor:pointer;">Quay lại</button>
+            <div id="manage-view">
+                <div class="panel">
+                    <h3 style="margin-top: 0; color: var(--blue); font-size: 20px; font-weight: 900;">⚙️ Quản Lý & Tỉa Tót Thẻ</h3>
+                    <select id="manage-deck-select" onchange="renderManageList()" style="width:100%; padding:15px; border-radius:15px; border: 2px solid #f1f2f6; font-weight:900; font-size: 15px; color:#2c3e50; margin-bottom: 20px; outline:none; appearance: none;"></select>
+                    
+                    <div class="stats-box" id="manage-stats">
+                        <div>Tổng số từ<span>0</span></div>
+                        <div>Đã thuộc lòng<span>0</span></div>
+                    </div>
+
+                    <div id="manage-list" class="word-list-container"></div>
                 </div>
-                <div id="preview-list" class="word-list-container"></div>
-                <button onclick="saveFinalData()" style="width:100%; padding:18px; background:var(--primary-dark); color:white; border:none; border-radius:20px; font-weight:900; box-shadow:0 5px 15px rgba(92,219,92,0.4);">✨ LƯU VÀO BỘ NHỚ</button>
             </div>
         </div>
 
-        <div id="manage-view">
-            <div class="panel">
-                <h3 style="margin-top: 0; color: var(--blue);">Quản Lý Thẻ & Sửa Chữ</h3>
-                <select id="manage-deck-select" onchange="renderManageList()" style="width:100%; padding:12px; border-radius:12px; border: 1px solid #dfe6e9; font-weight:bold; color:var(--blue); margin-bottom: 15px;"></select>
-                
-                <div class="stats-box" id="manage-stats">
-                    <div>Tổng số<span>0</span></div>
-                    <div>Đã nhớ<span>0</span></div>
-                </div>
-
-                <div id="manage-list" class="word-list-container"></div>
+        <div class="tab-bar">
+            <div class="tab-item active" id="tab-study" onclick="switchTab('study')">
+                <span class="tab-icon">📚</span><span>HỌC BÀI</span>
             </div>
-        </div>
-    </div>
-
-    <div class="tab-bar">
-        <div class="tab-item active" id="tab-study" onclick="switchTab('study')">
-            <span class="tab-icon">📚</span><span>Học Bài</span>
-        </div>
-        <div class="tab-item" id="tab-add" onclick="switchTab('add')">
-            <span class="tab-icon">✏️</span><span>Nhập Liệu</span>
-        </div>
-        <div class="tab-item" id="tab-manage" onclick="switchTab('manage')">
-            <span class="tab-icon">⚙️</span><span>Quản Lý</span>
+            <div class="tab-item" id="tab-add" onclick="switchTab('add')">
+                <span class="tab-icon">⚡</span><span>NHẬP NHANH</span>
+            </div>
+            <div class="tab-item" id="tab-manage" onclick="switchTab('manage')">
+                <span class="tab-icon">⚙️</span><span>QUẢN LÝ</span>
+            </div>
         </div>
     </div>
 
@@ -182,14 +206,12 @@
         let appData = {}; let currentDeck = ""; let sessionCards = []; let currentIndex = 0; let writer;
         const defaultImg = "https://images.unsplash.com/photo-1515260268569-9271009adfdb?w=400";
 
-        // ================= KHỞI TẠO ÂM THANH CHO iOS ================= //
+        // ================= XỬ LÝ ÂM THANH CHUẨN ĐA NỀN TẢNG (Khắc phục lỗi iOS) ================= //
         function initVoices() {
             if ('speechSynthesis' in window) {
                 window.speechSynthesis.getVoices();
                 if (speechSynthesis.onvoiceschanged !== undefined) {
-                    speechSynthesis.onvoiceschanged = function() {
-                        window.speechSynthesis.getVoices();
-                    };
+                    speechSynthesis.onvoiceschanged = function() { window.speechSynthesis.getVoices(); };
                 }
             }
         }
@@ -197,16 +219,12 @@
         function playAudio(e) {
             if(e) e.stopPropagation();
             if ('speechSynthesis' in window) {
-                // "Chống kẹt" cho Safari trên iOS
-                window.speechSynthesis.cancel(); 
-                
-                // Cần độ trễ nhỏ để Safari kịp reset audio context
+                window.speechSynthesis.cancel(); // Xóa bộ đệm bị kẹt
                 setTimeout(() => {
                     const msg = new SpeechSynthesisUtterance(sessionCards[currentIndex].hanzi);
                     msg.lang = 'zh-CN'; 
-                    msg.rate = 0.85; 
+                    msg.rate = 0.85; // Tốc độ chuẩn
                     
-                    // Tìm giọng tiếng Trung chính xác nếu có
                     const voices = window.speechSynthesis.getVoices();
                     const zhVoice = voices.find(v => v.lang.includes('zh') || v.lang.includes('CN'));
                     if (zhVoice) msg.voice = zhVoice;
@@ -214,13 +232,10 @@
                     window.speechSynthesis.speak(msg);
                 }, 50);
             } else {
-                console.log("Trình duyệt không hỗ trợ đọc giọng nói.");
+                alert("Rất tiếc, trình duyệt của máy này không hỗ trợ đọc giọng nói.");
             }
         }
-
-        function manualPlayAudio(e) {
-            playAudio(e);
-        }
+        function manualPlayAudio(e) { playAudio(e); }
 
         // ================= SRS & STREAK ================= //
         function updateStreak() {
@@ -235,7 +250,7 @@
                 localStorage.setItem('lastStudyDate', todayStr);
                 localStorage.setItem('streakCount', streak);
             }
-            document.getElementById('streak-display').innerText = `🔥 Streak: ${streak} ngày`;
+            document.getElementById('streak-display').innerText = `🔥 Chuỗi học: ${streak} ngày`;
         }
 
         function handleSRS(quality) {
@@ -245,8 +260,7 @@
             else if (quality === 3) daysToAdd = 1;
             
             if (quality > 1) {
-                const nextDate = new Date();
-                nextDate.setDate(nextDate.getDate() + daysToAdd);
+                const nextDate = new Date(); nextDate.setDate(nextDate.getDate() + daysToAdd);
                 card.nextReview = nextDate.getTime();
             }
 
@@ -258,21 +272,28 @@
                 sessionCards.push(sessionCards.splice(currentIndex, 1)[0]);
                 loadCard();
             } else {
-                currentIndex++;
-                loadCard();
+                currentIndex++; loadCard();
             }
         }
 
         // ================= UI & DATA KHỞI TẠO ================= //
         function initApp() {
             initVoices();
-            const data = localStorage.getItem('anhwang_v17');
-            appData = data ? JSON.parse(data) : { "Từ vựng Boya": [] };
+            const data = localStorage.getItem('anhwang_v18');
+            appData = data ? JSON.parse(data) : { "Từ vựng Boya 1": [] };
             updateDeckSelectors();
             updateStreak();
+            
+            // Đánh thức iOS Audio Context khi người dùng chạm lần đầu vào màn hình
+            document.body.addEventListener('touchstart', function() {
+                if ('speechSynthesis' in window) {
+                    let utterance = new SpeechSynthesisUtterance('');
+                    window.speechSynthesis.speak(utterance);
+                }
+            }, { once: true });
         }
 
-        function saveToStorage() { localStorage.setItem('anhwang_v17', JSON.stringify(appData)); }
+        function saveToStorage() { localStorage.setItem('anhwang_v18', JSON.stringify(appData)); }
 
         function switchTab(tab) {
             document.getElementById('study-view').style.display = tab === 'study' ? 'flex' : 'none';
@@ -312,7 +333,7 @@
         function loadCard() {
             if (currentIndex >= sessionCards.length) {
                 document.getElementById('learning-area').style.display = 'none';
-                document.getElementById('stats').innerText = "🎉 Hoàn thành bài học hôm nay!";
+                document.getElementById('stats').innerText = "🎉 Tuyệt vời! Anh đã hoàn thành mục tiêu hôm nay.";
                 document.getElementById('action-buttons').classList.remove('visible');
                 return;
             }
@@ -327,7 +348,7 @@
             
             document.getElementById('hanzi-target').innerHTML = '';
             writer = HanziWriter.create('hanzi-target', card.hanzi, {
-                width: 120, height: 120, padding: 5, strokeAnimationSpeed: 1.5, delayBetweenStrokes: 150
+                width: 140, height: 140, padding: 5, strokeAnimationSpeed: 1.5, delayBetweenStrokes: 150
             });
         }
 
@@ -338,12 +359,57 @@
                 document.getElementById('action-buttons').classList.add('visible');
                 if (writer) writer.animateCharacter();
                 
-                // Tự động đọc
-                if(document.getElementById('autoplay-cb').checked) {
-                    playAudio(null);
-                }
+                if(document.getElementById('autoplay-cb').checked) { playAudio(null); }
             }
         }
+
+        // ================= XUẤT NHẬP FILE (ĐÃ SỬA LỖI 100%) ================= //
+        function exportData() {
+            try {
+                // Đóng gói dữ liệu thành chuỗi chuẩn JSON
+                const dataStr = JSON.stringify(appData, null, 2);
+                const blob = new Blob([dataStr], { type: "application/json" });
+                const url = URL.createObjectURL(blob);
+                
+                // Tạo link tải ảo và ép trình duyệt tải xuống (Tương thích tốt PC & Mobile)
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `TuVung_AnhWang_${new Date().toISOString().slice(0,10)}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } catch(error) {
+                alert("Lỗi khi xuất file: " + error);
+            }
+        }
+
+        function importData(e) {
+            const file = e.target.files[0]; 
+            if(!file) return;
+            
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    // PHẦN SỬA LỖI: Cố gắng phân tích cú pháp chuỗi văn bản lấy từ file
+                    const parsedData = JSON.parse(ev.target.result);
+                    if(typeof parsedData === 'object' && parsedData !== null) {
+                        appData = parsedData; 
+                        saveToStorage(); 
+                        updateDeckSelectors(); 
+                        alert("🎉 Nhập dữ liệu thành công! Toàn bộ từ vựng đã được khôi phục.");
+                    } else {
+                        alert("File không chứa dữ liệu hợp lệ.");
+                    }
+                } catch(error) {
+                    alert("❌ Lỗi đọc file! Vui lòng đảm bảo anh đang chọn đúng file .json được xuất từ ứng dụng này.");
+                }
+            };
+            // PHẦN SỬA LỖI QUAN TRỌNG NHẤT: Đọc file dưới dạng Text thay vì DataURL
+            reader.readAsText(file); 
+            e.target.value = ""; // Reset input để có thể chọn lại cùng 1 file nếu cần
+        }
+
 
         // ================= LOGIC QUẢN LÝ & CHỈNH SỬA ================= //
         function renderManageList() {
@@ -357,8 +423,8 @@
             let mastered = cards.filter(c => c.nextReview && c.nextReview > now).length;
             
             document.getElementById('manage-stats').innerHTML = `
-                <div>Tổng số<span>${cards.length}</span></div>
-                <div>Đã nhớ (Dễ)<span>${mastered}</span></div>
+                <div>Tổng số từ<span>${cards.length}</span></div>
+                <div>Đã thuộc lòng<span>${mastered}</span></div>
             `;
 
             cards.forEach((w, i) => {
@@ -383,14 +449,13 @@
         function updateOldCard(deck, index, field, value) { appData[deck][index][field] = value; saveToStorage(); }
 
         function deleteOldCard(deck, index) {
-            if(confirm("Xóa thẻ này vĩnh viễn?")) {
+            if(confirm("Anh có chắc chắn muốn xóa thẻ này vĩnh viễn không?")) {
                 appData[deck].splice(index, 1); saveToStorage(); renderManageList(); updateDeckSelectors();
             }
         }
 
         function uploadManageImg(input, deck, index) {
-            const file = input.files[0]; if(!file) return;
-            const reader = new FileReader();
+            const file = input.files[0]; if(!file) return; const reader = new FileReader();
             reader.onload = (e) => {
                 const img = new Image();
                 img.onload = function() {
@@ -417,10 +482,9 @@
                 return { hanzi: p[0], pinyin: p[1]||"", meaning: p[2]||"", image_url: defaultImg, nextReview: 0 };
             }).filter(w => w.hanzi !== "");
 
-            if (tempWords.length === 0) return alert("Sai cú pháp rồi anh ơi!");
+            if (tempWords.length === 0) return alert("Sai cú pháp nhập rồi anh ơi!");
 
-            const list = document.getElementById('preview-list');
-            list.innerHTML = '';
+            const list = document.getElementById('preview-list'); list.innerHTML = '';
             tempWords.forEach((w, i) => {
                 const div = document.createElement('div'); div.className = 'preview-item';
                 div.innerHTML = `
@@ -463,13 +527,11 @@
 
         function saveFinalData() {
             const deck = document.getElementById('add-deck-select').value; appData[deck] = appData[deck].concat(tempWords);
-            saveToStorage(); updateDeckSelectors(); alert("Đã lưu thành công!");
+            saveToStorage(); updateDeckSelectors(); alert("✨ Tuyệt vời! Đã lưu thành công vào máy.");
             document.getElementById('bulk-input').value = ""; switchTab('study');
         }
 
-        function promptCreateDeck() { const n = prompt("Tên thư mục mới:"); if(n) { appData[n] = []; saveToStorage(); updateDeckSelectors(); } }
-        function exportData() { const blob = new Blob([JSON.stringify(appData)], {type: 'application/json'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'anhwang_chinese_backup.json'; a.click(); }
-        function importData(e) { const file = e.target.files[0]; if(!file) return; const reader = new FileReader(); reader.onload = (ev) => { appData = JSON.parse(ev.target.result); saveToStorage(); updateDeckSelectors(); alert("Đã nhập dữ liệu thành công!"); }; reader.readAsDataURL(file); e.target.value = ""; }
+        function promptCreateDeck() { const n = prompt("Nhập tên thư mục mới:"); if(n && n.trim() !== "") { appData[n.trim()] = []; saveToStorage(); updateDeckSelectors(); } }
 
         window.onload = initApp;
     </script>
